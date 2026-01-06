@@ -3,7 +3,7 @@ import StatCard from './StatCard';
 import { statIcons, actionIcons, activityIcons, infoIcons } from '../../config/icons';
 import '../../styles/Dashboard.css';
 
-function Dashboard() {
+function Dashboard({ onPageChange, onAddAccount }) {
   const [stats, setStats] = useState({
     totalAccounts: 0,
     activeAccounts: 0,
@@ -108,27 +108,27 @@ function Dashboard() {
           <div className="dashboard-card quick-actions">
             <h2 className="card-title">Quick Actions</h2>
             <div className="quick-actions-grid">
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={onAddAccount}>
                 <span className="action-icon"><actionIcons.plus size={24} /></span>
                 <span className="action-label">Add Account</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={() => onPageChange('instances')}>
                 <span className="action-icon"><actionIcons.smartphone size={24} /></span>
                 <span className="action-label">Open Instance</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={() => onPageChange('automation')}>
                 <span className="action-icon"><actionIcons.bot size={24} /></span>
                 <span className="action-label">Start Automation</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={() => onPageChange('analytics')}>
                 <span className="action-icon"><actionIcons.chart size={24} /></span>
                 <span className="action-label">View Analytics</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={() => onPageChange('tags')}>
                 <span className="action-icon"><actionIcons.tag size={24} /></span>
                 <span className="action-label">Manage Tags</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={() => onPageChange('export')}>
                 <span className="action-icon"><actionIcons.upload size={24} /></span>
                 <span className="action-label">Export Data</span>
               </button>
