@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
+import Layout from './components/layout/Layout';
+import Dashboard from './components/dashboard/Dashboard';
 import AccountList from './components/AccountList.jsx';
 import AddAccount from './components/AddAccount.jsx';
+import InstanceController from './components/instances/InstanceController';
+import './styles/variables.css';
 import './styles/App.css';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [accounts, setAccounts] = useState([]);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [theme, setTheme] = useState('dark');
-  const [searchQuery, setSearchQuery] = useState('');
 
-  // Load accounts on mount
+  // Load accounts and theme on mount
   useEffect(() => {
     loadAccounts();
     loadTheme();
@@ -41,6 +45,21 @@ function App() {
     } catch (error) {
       console.error('Error loading theme:', error);
     }
+  };
+
+  const handleThemeChange = async (newTheme) => {
+    setTheme(newTheme);
+    try {
+      await window.electronAPI.setTheme(newTheme);
+    } catch (error) {
+      console.error('Error saving theme:', error);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setShowAddAccount(false);
+    setEditingAccount(null);
   };
 
   const handleAddAccount = async (accountData) => {
@@ -94,15 +113,18 @@ function App() {
 
   const handleLogin = async (accountId) => {
     try {
-      const result = await window.electronAPI.restoreSession(accountId);
+      // Use new mobile instance instead of old session
+      const result = await window.electronAPI.createMobileInstance(accountId);
       if (result.success) {
         await loadAccounts();
+        // Optionally switch to instances page
+        setCurrentPage('instances');
       } else {
-        alert('Failed to open session: ' + result.error);
+        alert('Failed to open instance: ' + result.error);
       }
     } catch (error) {
-      console.error('Error opening session:', error);
-      alert('Failed to open session');
+      console.error('Error opening instance:', error);
+      alert('Failed to open instance');
     }
   };
 
@@ -111,88 +133,160 @@ function App() {
     setShowAddAccount(true);
   };
 
-  const toggleTheme = async () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    try {
-      await window.electronAPI.setTheme(newTheme);
-    } catch (error) {
-      console.error('Error saving theme:', error);
+  // Render page content based on current page
+  const renderPage = () => {
+    if (showAddAccount) {
+      return (
+        <AddAccount
+          account={editingAccount}
+          onSave={editingAccount ? handleUpdateAccount : handleAddAccount}
+          onCancel={() => {
+            setShowAddAccount(false);
+            setEditingAccount(null);
+          }}
+        />
+      );
+    }
+
+    switch (currentPage) {
+      case 'dashboard':
+        return <Dashboard />;
+      
+      case 'accounts':
+        return (
+          <div>
+            <div className="page-header">
+              <div>
+                <h1 className="page-title">👥 Accounts</h1>
+                <p className="page-subtitle">Manage all your TikTok accounts</p>
+              </div>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setEditingAccount(null);
+                  setShowAddAccount(true);
+                }}
+              >
+                <span>+</span> Add Account
+              </button>
+            </div>
+            <AccountList
+              accounts={accounts}
+              onLogin={handleLogin}
+              onEdit={handleEdit}
+              onDelete={handleDeleteAccount}
+            />
+          </div>
+        );
+      
+      case 'instances':
+        return <InstanceController />;
+      
+      case 'automation':
+        return (
+          <div className="page-header">
+            <h1 className="page-title">🤖 Automation</h1>
+            <p className="page-subtitle">Manage automation settings and presets</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">🤖</div>
+              <h2 className="empty-state-title">Automation Panel</h2>
+              <p className="empty-state-description">
+                Configure automation settings for your accounts. Coming soon in this view!
+                For now, automation settings are available per account.
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'analytics':
+        return (
+          <div className="page-header">
+            <h1 className="page-title">📈 Analytics</h1>
+            <p className="page-subtitle">View detailed analytics and reports</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">📈</div>
+              <h2 className="empty-state-title">Analytics Dashboard</h2>
+              <p className="empty-state-description">
+                Detailed charts and analytics will be displayed here. Feature coming soon!
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'content':
+        return (
+          <div className="page-header">
+            <h1 className="page-title">🎥 Content Queue</h1>
+            <p className="page-subtitle">Manage scheduled content</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">🎥</div>
+              <h2 className="empty-state-title">Content Queue</h2>
+              <p className="empty-state-description">
+                Schedule and manage video uploads across accounts. Feature coming soon!
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'tags':
+        return (
+          <div className="page-header">
+            <h1 className="page-title">🏷️ Tags Manager</h1>
+            <p className="page-subtitle">Organize accounts with tags</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">🏷️</div>
+              <h2 className="empty-state-title">Tags Manager</h2>
+              <p className="empty-state-description">
+                Create and manage tags to organize your accounts. Feature coming soon!
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'settings':
+        return (
+          <div className="page-header">
+            <h1 className="page-title">⚙️ Settings</h1>
+            <p className="page-subtitle">Configure application settings</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">⚙️</div>
+              <h2 className="empty-state-title">Settings</h2>
+              <p className="empty-state-description">
+                Application settings and preferences. Feature coming soon!
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'export':
+        return (
+          <div className="page-header">
+            <h1 className="page-title">📤 Export/Import</h1>
+            <p className="page-subtitle">Backup and restore your data</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">📤</div>
+              <h2 className="empty-state-title">Export/Import</h2>
+              <p className="empty-state-description">
+                Export and import account data. Feature coming soon!
+              </p>
+            </div>
+          </div>
+        );
+      
+      default:
+        return <Dashboard />;
     }
   };
 
-  const filteredAccounts = accounts.filter(account =>
-    account.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    account.nickname?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div className="app">
-      <header className="app-header">
-        <div className="header-content">
-          <h1 className="app-title">
-            <span className="icon">🎵</span>
-            TikTok Account Manager
-          </h1>
-          <div className="header-actions">
-            <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="app-main">
-        <div className="main-header">
-          <div className="search-bar">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Search accounts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-            />
-          </div>
-          <button
-            className="btn-add-account"
-            onClick={() => {
-              setEditingAccount(null);
-              setShowAddAccount(true);
-            }}
-          >
-            <span className="btn-icon">+</span>
-            Add Account
-          </button>
-        </div>
-
-        {showAddAccount ? (
-          <AddAccount
-            account={editingAccount}
-            onSave={editingAccount ? handleUpdateAccount : handleAddAccount}
-            onCancel={() => {
-              setShowAddAccount(false);
-              setEditingAccount(null);
-            }}
-          />
-        ) : (
-          <AccountList
-            accounts={filteredAccounts}
-            onLogin={handleLogin}
-            onEdit={handleEdit}
-            onDelete={handleDeleteAccount}
-          />
-        )}
-      </main>
-
-      <footer className="app-footer">
-        <p>
-          Total Accounts: <strong>{accounts.length}</strong> | 
-          Active: <strong>{accounts.filter(a => a.isActive).length}</strong>
-        </p>
-        <p className="security-note">🔒 All credentials are encrypted with AES-256</p>
-      </footer>
-    </div>
+    <Layout
+      currentPage={currentPage}
+      onPageChange={handlePageChange}
+      theme={theme}
+      onThemeChange={handleThemeChange}
+    >
+      {renderPage()}
+    </Layout>
   );
 }
 

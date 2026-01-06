@@ -19,7 +19,13 @@
     "package:linux": "electron-builder --linux",
     "preview": "vite preview"
   },
-  "keywords": ["tiktok", "multi-account", "social-media", "automation", "electron"],
+  "keywords": [
+    "tiktok",
+    "multi-account",
+    "social-media",
+    "automation",
+    "electron"
+  ],
   "author": "ChoeurnDesign",
   "license": "MIT",
   "devDependencies": {
@@ -32,11 +38,13 @@
     "wait-on": "^9.0.3"
   },
   "dependencies": {
+    "better-sqlite3": "^12.5.0",
     "crypto-js": "^4.2.0",
     "electron-store": "^11.0.2",
     "puppeteer-core": "^24.34.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "recharts": "^3.6.0"
   },
   "build": {
     "appId": "com.choeurdesign.socialmediatools",
@@ -50,16 +58,22 @@
       "package.json"
     ],
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "public/icon.png"
     },
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "icon": "public/icon.png",
       "category": "public.app-category.utilities"
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "icon": "public/icon.png",
       "category": "Utility"
     },
