@@ -24,6 +24,7 @@ async function buildElectron() {
           'electron-store', 
           'crypto-js', 
           'puppeteer-core',
+          'better-sqlite3',
           'url',
           'path',
           'fs',
@@ -48,6 +49,28 @@ async function buildElectron() {
         entry: resolve(__dirname, 'src/main/preload.js'),
         formats: ['cjs'],
         fileName: () => 'preload.js',
+      },
+      outDir: 'dist-electron',
+      emptyOutDir: false,
+      rollupOptions: {
+        external: ['electron'],
+        output: {
+          format: 'cjs',
+        },
+      },
+      target: 'node18',
+      ssr: true,
+    },
+  });
+
+  // Build mobile preload script
+  await build({
+    configFile: false,
+    build: {
+      lib: {
+        entry: resolve(__dirname, 'src/mobile/mobile-preload.js'),
+        formats: ['cjs'],
+        fileName: () => 'mobile-preload.js',
       },
       outDir: 'dist-electron',
       emptyOutDir: false,
