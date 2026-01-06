@@ -1,0 +1,71 @@
+{
+  "name": "social-media-tools",
+  "version": "1.0.0",
+  "description": "Multi-account manager for TikTok and other social media platforms",
+  "main": "dist-electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "cross-env NODE_ENV=development wait-on tcp:5173 && electron .",
+    "build": "npm run build:renderer && npm run build:electron && electron-builder",
+    "build:renderer": "vite build",
+    "build:electron": "node build-electron.js",
+    "build:win": "npm run build:renderer && npm run build:electron && electron-builder --win",
+    "build:mac": "npm run build:renderer && npm run build:electron && electron-builder --mac",
+    "build:linux": "npm run build:renderer && npm run build:electron && electron-builder --linux",
+    "package:win": "electron-builder --win",
+    "package:mac": "electron-builder --mac",
+    "package:linux": "electron-builder --linux",
+    "preview": "vite preview"
+  },
+  "keywords": ["tiktok", "multi-account", "social-media", "automation", "electron"],
+  "author": "ChoeurnDesign",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "vite": "^7.3.0",
+    "wait-on": "^9.0.3"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "electron-store": "^11.0.2",
+    "puppeteer-core": "^24.34.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "build": {
+    "appId": "com.choeurdesign.socialmediatools",
+    "productName": "TikTok Account Manager",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "public/icon.png"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "public/icon.png",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "public/icon.png",
+      "category": "Utility"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
