@@ -1,15 +1,28 @@
 import Store from 'electron-store';
 import CryptoJS from 'crypto-js';
 
-// Encryption key - In production, this should be derived from a master password
+/**
+ * SECURITY NOTE: The encryption key below is a basic implementation for demonstration.
+ * 
+ * For production use, consider these improvements:
+ * 1. Derive key from a user-provided master password using PBKDF2
+ * 2. Generate a unique key per installation stored in system keychain
+ * 3. Use environment variables or secure configuration management
+ * 4. Implement key rotation and version management
+ * 
+ * This basic key provides encryption at rest but should be enhanced
+ * before deploying to production environments.
+ */
 const ENCRYPTION_KEY = 'tiktok-account-manager-v1-secret-key-2024';
 
 class SecureStorage {
-  constructor() {
+  constructor(customEncryptionKey = null) {
     this.store = new Store({
       name: 'tiktok-accounts',
       encryptionKey: 'obfuscation-key-for-store'
     });
+    // Allow custom encryption key for future master password implementation
+    this.encryptionKey = customEncryptionKey || ENCRYPTION_KEY;
   }
 
   // Encrypt data using AES-256
@@ -17,7 +30,7 @@ class SecureStorage {
     try {
       const encrypted = CryptoJS.AES.encrypt(
         JSON.stringify(data),
-        ENCRYPTION_KEY
+        this.encryptionKey
       ).toString();
       return encrypted;
     } catch (error) {
@@ -29,7 +42,7 @@ class SecureStorage {
   // Decrypt data
   decrypt(encryptedData) {
     try {
-      const decrypted = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
+      const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
       const decryptedString = decrypted.toString(CryptoJS.enc.Utf8);
       return JSON.parse(decryptedString);
     } catch (error) {

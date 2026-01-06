@@ -189,6 +189,10 @@ social-media-tools/
 - All passwords are encrypted using AES-256 before storage
 - Encryption key is stored separately from data
 - No plain-text credentials ever written to disk
+- **Note**: Current implementation uses a static encryption key for simplicity. For enhanced security in production deployments, consider implementing:
+  - Master password-based key derivation using PBKDF2
+  - System keychain integration for key storage
+  - Per-installation unique encryption keys
 
 **Session Security:**
 - Each account gets an isolated browser session
