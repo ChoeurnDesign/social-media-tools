@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+dist-electron/
+out/
+build/
+
+# Electron
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+
+# User data
+user-data/
+sessions/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
