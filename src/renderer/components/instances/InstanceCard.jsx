@@ -1,3 +1,4 @@
+import { statusIcons } from '../../config/icons';
 import '../../styles/Instances.css';
 
 function InstanceCard({ instance, onRefresh }) {
@@ -22,7 +23,7 @@ function InstanceCard({ instance, onRefresh }) {
           onClick={handleClose}
           title="Close instance"
         >
-          ✕
+          <statusIcons.close size={16} />
         </button>
       </div>
       
@@ -38,7 +39,17 @@ function InstanceCard({ instance, onRefresh }) {
         <div className="info-row">
           <span className="info-label">Status:</span>
           <span className={`status-badge ${instance.isVisible ? 'visible' : 'hidden'}`}>
-            {instance.isVisible ? '👁️ Visible' : '🙈 Hidden'}
+            {instance.isVisible ? (
+              <>
+                <statusIcons.visible size={16} style={{ marginRight: '6px', display: 'inline' }} />
+                Visible
+              </>
+            ) : (
+              <>
+                <statusIcons.hidden size={16} style={{ marginRight: '6px', display: 'inline' }} />
+                Hidden
+              </>
+            )}
           </span>
         </div>
       </div>

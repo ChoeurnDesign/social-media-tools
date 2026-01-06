@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import StatCard from './StatCard';
+import { statIcons, actionIcons, activityIcons, infoIcons } from '../../config/icons';
 import '../../styles/Dashboard.css';
 
 function Dashboard() {
@@ -59,42 +60,42 @@ function Dashboard() {
 
       <div className="stats-overview">
         <StatCard
-          icon="👥"
+          icon={statIcons.users}
           title="Total Accounts"
           value={stats.totalAccounts}
           subtitle="Managed accounts"
           gradient="primary"
         />
         <StatCard
-          icon="🟢"
+          icon={statIcons.active}
           title="Active Now"
           value={stats.activeAccounts}
           subtitle={`${stats.activePercentage}% of total`}
           gradient="success"
         />
         <StatCard
-          icon="❤️"
+          icon={statIcons.heart}
           title="Total Followers"
           value={formatNumber(stats.totalFollowers)}
           subtitle="Across all accounts"
           gradient="secondary"
         />
         <StatCard
-          icon="📊"
+          icon={statIcons.chart}
           title="Total Posts"
           value={formatNumber(stats.totalPosts)}
           subtitle="Content created"
           gradient="accent"
         />
         <StatCard
-          icon="👁️"
+          icon={statIcons.eye}
           title="Total Views"
           value={formatNumber(stats.totalViews)}
           subtitle="All-time views"
           gradient="info"
         />
         <StatCard
-          icon="🚀"
+          icon={statIcons.rocket}
           title="Growth Rate"
           value="+12%"
           subtitle="This week"
@@ -108,27 +109,27 @@ function Dashboard() {
             <h2 className="card-title">Quick Actions</h2>
             <div className="quick-actions-grid">
               <button className="quick-action-btn">
-                <span className="action-icon">➕</span>
+                <span className="action-icon"><actionIcons.plus size={24} /></span>
                 <span className="action-label">Add Account</span>
               </button>
               <button className="quick-action-btn">
-                <span className="action-icon">📱</span>
+                <span className="action-icon"><actionIcons.smartphone size={24} /></span>
                 <span className="action-label">Open Instance</span>
               </button>
               <button className="quick-action-btn">
-                <span className="action-icon">🤖</span>
+                <span className="action-icon"><actionIcons.bot size={24} /></span>
                 <span className="action-label">Start Automation</span>
               </button>
               <button className="quick-action-btn">
-                <span className="action-icon">📊</span>
+                <span className="action-icon"><actionIcons.chart size={24} /></span>
                 <span className="action-label">View Analytics</span>
               </button>
               <button className="quick-action-btn">
-                <span className="action-icon">🏷️</span>
+                <span className="action-icon"><actionIcons.tag size={24} /></span>
                 <span className="action-label">Manage Tags</span>
               </button>
               <button className="quick-action-btn">
-                <span className="action-icon">📤</span>
+                <span className="action-icon"><actionIcons.upload size={24} /></span>
                 <span className="action-label">Export Data</span>
               </button>
             </div>
@@ -138,28 +139,28 @@ function Dashboard() {
             <h2 className="card-title">Recent Activity</h2>
             <div className="activity-list">
               <div className="activity-item">
-                <span className="activity-icon">✅</span>
+                <span className="activity-icon"><activityIcons.check size={20} /></span>
                 <div className="activity-content">
                   <div className="activity-text">Account added successfully</div>
                   <div className="activity-time">2 minutes ago</div>
                 </div>
               </div>
               <div className="activity-item">
-                <span className="activity-icon">📱</span>
+                <span className="activity-icon"><activityIcons.smartphone size={20} /></span>
                 <div className="activity-content">
                   <div className="activity-text">Mobile instance opened for @user123</div>
                   <div className="activity-time">5 minutes ago</div>
                 </div>
               </div>
               <div className="activity-item">
-                <span className="activity-icon">🤖</span>
+                <span className="activity-icon"><activityIcons.bot size={20} /></span>
                 <div className="activity-content">
                   <div className="activity-text">Automation started for 3 accounts</div>
                   <div className="activity-time">10 minutes ago</div>
                 </div>
               </div>
               <div className="activity-item">
-                <span className="activity-icon">❤️</span>
+                <span className="activity-icon"><activityIcons.heart size={20} /></span>
                 <div className="activity-content">
                   <div className="activity-text">Auto-liked 15 videos</div>
                   <div className="activity-time">15 minutes ago</div>
@@ -171,14 +172,20 @@ function Dashboard() {
 
         <div className="dashboard-info">
           <div className="info-card">
-            <h3 className="info-title">🚀 Getting Started</h3>
+            <h3 className="info-title">
+              <infoIcons.rocket size={20} style={{ display: 'inline', marginRight: '8px' }} />
+              Getting Started
+            </h3>
             <p className="info-text">
               Welcome to TikTok Manager Pro! Start by adding your accounts, then use mobile instances 
               to manage them simultaneously. Enable automation for organic growth.
             </p>
           </div>
           <div className="info-card">
-            <h3 className="info-title">💡 Pro Tip</h3>
+            <h3 className="info-title">
+              <infoIcons.lightbulb size={20} style={{ display: 'inline', marginRight: '8px' }} />
+              Pro Tip
+            </h3>
             <p className="info-text">
               Use the "Organic" automation preset for natural engagement patterns that avoid detection. 
               Adjust settings per account for best results.

@@ -1,17 +1,18 @@
 import { useState } from 'react';
+import { sidebarIcons } from '../../config/icons';
 import '../../styles/Sidebar.css';
 
 function Sidebar({ currentPage, onPageChange, collapsed, onToggleCollapse }) {
   const menuItems = [
-    { id: 'dashboard', icon: '📊', label: 'Dashboard', badge: null },
-    { id: 'accounts', icon: '👥', label: 'Accounts', badge: null },
-    { id: 'instances', icon: '📱', label: 'Mobile Instances', badge: null },
-    { id: 'automation', icon: '🤖', label: 'Automation', badge: null },
-    { id: 'analytics', icon: '📈', label: 'Analytics', badge: null },
-    { id: 'content', icon: '🎥', label: 'Content Queue', badge: 'Soon' },
-    { id: 'tags', icon: '🏷️', label: 'Tags Manager', badge: null },
-    { id: 'settings', icon: '⚙️', label: 'Settings', badge: null },
-    { id: 'export', icon: '📤', label: 'Export/Import', badge: null },
+    { id: 'dashboard', icon: sidebarIcons.dashboard, label: 'Dashboard', badge: null },
+    { id: 'accounts', icon: sidebarIcons.accounts, label: 'Accounts', badge: null },
+    { id: 'instances', icon: sidebarIcons.instances, label: 'Mobile Instances', badge: null },
+    { id: 'automation', icon: sidebarIcons.automation, label: 'Automation', badge: null },
+    { id: 'analytics', icon: sidebarIcons.analytics, label: 'Analytics', badge: null },
+    { id: 'content', icon: sidebarIcons.content, label: 'Content Queue', badge: 'Soon' },
+    { id: 'tags', icon: sidebarIcons.tags, label: 'Tags Manager', badge: null },
+    { id: 'settings', icon: sidebarIcons.settings, label: 'Settings', badge: null },
+    { id: 'export', icon: sidebarIcons.export, label: 'Export/Import', badge: null },
   ];
 
   return (
@@ -22,11 +23,11 @@ function Sidebar({ currentPage, onPageChange, collapsed, onToggleCollapse }) {
           onClick={onToggleCollapse}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? '☰' : '✕'}
+          {collapsed ? <sidebarIcons.menu size={20} /> : <sidebarIcons.close size={20} />}
         </button>
         {!collapsed && (
           <div className="sidebar-logo">
-            <div className="logo-icon">🎵</div>
+            <div className="logo-icon"><sidebarIcons.logo size={32} /></div>
             <div className="logo-text">
               <div className="logo-title">TikTok Manager</div>
               <div className="logo-subtitle">Pro</div>
@@ -36,24 +37,29 @@ function Sidebar({ currentPage, onPageChange, collapsed, onToggleCollapse }) {
       </div>
 
       <nav className="sidebar-nav">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            className={`sidebar-item ${currentPage === item.id ? 'active' : ''}`}
-            onClick={() => onPageChange(item.id)}
-            title={collapsed ? item.label : ''}
-          >
-            <span className="sidebar-item-icon">{item.icon}</span>
-            {!collapsed && (
-              <>
-                <span className="sidebar-item-label">{item.label}</span>
-                {item.badge && (
-                  <span className="sidebar-item-badge">{item.badge}</span>
-                )}
-              </>
-            )}
-          </button>
-        ))}
+        {menuItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.id}
+              className={`sidebar-item ${currentPage === item.id ? 'active' : ''}`}
+              onClick={() => onPageChange(item.id)}
+              title={collapsed ? item.label : ''}
+            >
+              <span className="sidebar-item-icon">
+                <IconComponent size={20} />
+              </span>
+              {!collapsed && (
+                <>
+                  <span className="sidebar-item-label">{item.label}</span>
+                  {item.badge && (
+                    <span className="sidebar-item-badge">{item.badge}</span>
+                  )}
+                </>
+              )}
+            </button>
+          );
+        })}
       </nav>
 
       <div className="sidebar-footer">

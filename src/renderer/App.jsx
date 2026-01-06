@@ -4,6 +4,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import AccountList from './components/AccountList.jsx';
 import AddAccount from './components/AddAccount.jsx';
 import InstanceController from './components/instances/InstanceController';
+import { sidebarIcons, actionIcons } from './config/icons';
 import './styles/variables.css';
 import './styles/App.css';
 
@@ -157,7 +158,10 @@ function App() {
           <div>
             <div className="page-header">
               <div>
-                <h1 className="page-title">👥 Accounts</h1>
+                <h1 className="page-title">
+                  <sidebarIcons.accounts size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+                  Accounts
+                </h1>
                 <p className="page-subtitle">Manage all your TikTok accounts</p>
               </div>
               <button
@@ -167,7 +171,8 @@ function App() {
                   setShowAddAccount(true);
                 }}
               >
-                <span>+</span> Add Account
+                <actionIcons.plus size={18} style={{ marginRight: '8px', display: 'inline' }} />
+                Add Account
               </button>
             </div>
             <AccountList
@@ -185,10 +190,13 @@ function App() {
       case 'automation':
         return (
           <div className="page-header">
-            <h1 className="page-title">🤖 Automation</h1>
+            <h1 className="page-title">
+              <sidebarIcons.automation size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+              Automation
+            </h1>
             <p className="page-subtitle">Manage automation settings and presets</p>
             <div className="empty-state">
-              <div className="empty-state-icon">🤖</div>
+              <div className="empty-state-icon"><sidebarIcons.automation size={64} /></div>
               <h2 className="empty-state-title">Automation Panel</h2>
               <p className="empty-state-description">
                 Configure automation settings for your accounts. Coming soon in this view!
@@ -201,10 +209,13 @@ function App() {
       case 'analytics':
         return (
           <div className="page-header">
-            <h1 className="page-title">📈 Analytics</h1>
+            <h1 className="page-title">
+              <sidebarIcons.analytics size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+              Analytics
+            </h1>
             <p className="page-subtitle">View detailed analytics and reports</p>
             <div className="empty-state">
-              <div className="empty-state-icon">📈</div>
+              <div className="empty-state-icon"><sidebarIcons.analytics size={64} /></div>
               <h2 className="empty-state-title">Analytics Dashboard</h2>
               <p className="empty-state-description">
                 Detailed charts and analytics will be displayed here. Feature coming soon!
@@ -216,10 +227,13 @@ function App() {
       case 'content':
         return (
           <div className="page-header">
-            <h1 className="page-title">🎥 Content Queue</h1>
+            <h1 className="page-title">
+              <sidebarIcons.content size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+              Content Queue
+            </h1>
             <p className="page-subtitle">Manage scheduled content</p>
             <div className="empty-state">
-              <div className="empty-state-icon">🎥</div>
+              <div className="empty-state-icon"><sidebarIcons.content size={64} /></div>
               <h2 className="empty-state-title">Content Queue</h2>
               <p className="empty-state-description">
                 Schedule and manage video uploads across accounts. Feature coming soon!
@@ -231,10 +245,13 @@ function App() {
       case 'tags':
         return (
           <div className="page-header">
-            <h1 className="page-title">🏷️ Tags Manager</h1>
+            <h1 className="page-title">
+              <sidebarIcons.tags size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+              Tags Manager
+            </h1>
             <p className="page-subtitle">Organize accounts with tags</p>
             <div className="empty-state">
-              <div className="empty-state-icon">🏷️</div>
+              <div className="empty-state-icon"><sidebarIcons.tags size={64} /></div>
               <h2 className="empty-state-title">Tags Manager</h2>
               <p className="empty-state-description">
                 Create and manage tags to organize your accounts. Feature coming soon!
@@ -246,10 +263,13 @@ function App() {
       case 'settings':
         return (
           <div className="page-header">
-            <h1 className="page-title">⚙️ Settings</h1>
+            <h1 className="page-title">
+              <sidebarIcons.settings size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+              Settings
+            </h1>
             <p className="page-subtitle">Configure application settings</p>
             <div className="empty-state">
-              <div className="empty-state-icon">⚙️</div>
+              <div className="empty-state-icon"><sidebarIcons.settings size={64} /></div>
               <h2 className="empty-state-title">Settings</h2>
               <p className="empty-state-description">
                 Application settings and preferences. Feature coming soon!
@@ -261,10 +281,13 @@ function App() {
       case 'export':
         return (
           <div className="page-header">
-            <h1 className="page-title">📤 Export/Import</h1>
+            <h1 className="page-title">
+              <sidebarIcons.export size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+              Export/Import
+            </h1>
             <p className="page-subtitle">Backup and restore your data</p>
             <div className="empty-state">
-              <div className="empty-state-icon">📤</div>
+              <div className="empty-state-icon"><sidebarIcons.export size={64} /></div>
               <h2 className="empty-state-title">Export/Import</h2>
               <p className="empty-state-description">
                 Export and import account data. Feature coming soon!

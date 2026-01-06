@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formIcons } from '../config/icons';
 import '../styles/AddAccount.css';
 
 function AddAccount({ account, onSave, onCancel }) {
@@ -78,7 +79,17 @@ function AddAccount({ account, onSave, onCancel }) {
     <div className="add-account">
       <div className="add-account-container">
         <h2 className="form-title">
-          {account ? '✏️ Edit Account' : '➕ Add New Account'}
+          {account ? (
+            <>
+              <formIcons.edit size={24} style={{ marginRight: '12px', display: 'inline', verticalAlign: 'middle' }} />
+              Edit Account
+            </>
+          ) : (
+            <>
+              <formIcons.plus size={24} style={{ marginRight: '12px', display: 'inline', verticalAlign: 'middle' }} />
+              Add New Account
+            </>
+          )}
         </h2>
 
         <form onSubmit={handleSubmit} className="account-form">
@@ -147,7 +158,8 @@ function AddAccount({ account, onSave, onCancel }) {
 
         <div className="security-info">
           <p>
-            🔒 Your credentials are encrypted using AES-256 encryption before being stored locally.
+            <formIcons.lock size={16} style={{ marginRight: '8px', display: 'inline', verticalAlign: 'middle' }} />
+            Your credentials are encrypted using AES-256 encryption before being stored locally.
           </p>
         </div>
       </div>

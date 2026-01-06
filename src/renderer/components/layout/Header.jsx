@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { headerIcons } from '../../config/icons';
 import '../../styles/Header.css';
 
 function Header({ theme, onThemeChange, searchQuery, onSearchChange }) {
@@ -19,7 +20,7 @@ function Header({ theme, onThemeChange, searchQuery, onSearchChange }) {
 
       <div className="header-center">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><headerIcons.search size={18} /></span>
           <input
             type="text"
             placeholder="Search accounts, groups, tags..."
@@ -33,7 +34,7 @@ function Header({ theme, onThemeChange, searchQuery, onSearchChange }) {
               onClick={() => onSearchChange('')}
               aria-label="Clear search"
             >
-              ✕
+              <headerIcons.close size={16} />
             </button>
           )}
         </div>
@@ -45,11 +46,11 @@ function Header({ theme, onThemeChange, searchQuery, onSearchChange }) {
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          {theme === 'dark' ? '☀️' : '🌙'}
+          {theme === 'dark' ? <headerIcons.sun size={18} /> : <headerIcons.moon size={18} />}
         </button>
 
         <button className="header-action-btn" title="Notifications">
-          <span className="notification-icon">🔔</span>
+          <span className="notification-icon"><headerIcons.bell size={18} /></span>
           <span className="notification-badge">3</span>
         </button>
 
@@ -58,7 +59,7 @@ function Header({ theme, onThemeChange, searchQuery, onSearchChange }) {
             className="user-avatar"
             onClick={() => setShowUserMenu(!showUserMenu)}
           >
-            <span>👤</span>
+            <headerIcons.user size={18} />
           </button>
           {showUserMenu && (
             <div className="user-dropdown">
@@ -68,20 +69,20 @@ function Header({ theme, onThemeChange, searchQuery, onSearchChange }) {
               </div>
               <div className="user-menu-divider"></div>
               <button className="user-menu-item">
-                <span>⚙️</span>
+                <headerIcons.settings size={16} />
                 Settings
               </button>
               <button className="user-menu-item">
-                <span>📖</span>
+                <headerIcons.docs size={16} />
                 Documentation
               </button>
               <button className="user-menu-item">
-                <span>💬</span>
+                <headerIcons.support size={16} />
                 Support
               </button>
               <div className="user-menu-divider"></div>
               <button className="user-menu-item danger">
-                <span>🚪</span>
+                <headerIcons.logout size={16} />
                 Sign Out
               </button>
             </div>
