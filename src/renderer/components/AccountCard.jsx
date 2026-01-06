@@ -1,3 +1,4 @@
+import { accountIcons } from '../config/icons';
 import '../styles/AccountCard.css';
 
 function AccountCard({ account, onLogin, onEdit, onDelete }) {
@@ -41,19 +42,31 @@ function AccountCard({ account, onLogin, onEdit, onDelete }) {
           onClick={() => onLogin(account.id)}
           disabled={account.isActive}
         >
-          {account.isActive ? '✓ Logged In' : '🚀 Login'}
+          {account.isActive ? (
+            <>
+              <accountIcons.check size={16} style={{ marginRight: '6px', display: 'inline' }} />
+              Logged In
+            </>
+          ) : (
+            <>
+              <accountIcons.rocket size={16} style={{ marginRight: '6px', display: 'inline' }} />
+              Login
+            </>
+          )}
         </button>
         <button
           className="btn btn-secondary"
           onClick={() => onEdit(account)}
         >
-          ✏️ Edit
+          <accountIcons.edit size={16} style={{ marginRight: '6px', display: 'inline' }} />
+          Edit
         </button>
         <button
           className="btn btn-danger"
           onClick={() => onDelete(account.id)}
         >
-          🗑️ Delete
+          <accountIcons.delete size={16} style={{ marginRight: '6px', display: 'inline' }} />
+          Delete
         </button>
       </div>
 

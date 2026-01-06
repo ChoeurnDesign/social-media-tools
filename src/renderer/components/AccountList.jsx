@@ -1,11 +1,12 @@
 import AccountCard from './AccountCard.jsx';
+import { instanceIcons } from '../config/icons';
 import '../styles/AccountList.css';
 
 function AccountList({ accounts, onLogin, onEdit, onDelete }) {
   if (accounts.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-icon">📱</div>
+        <div className="empty-icon"><instanceIcons.smartphone size={64} /></div>
         <h2>No Accounts Yet</h2>
         <p>Click "Add Account" to get started with managing your TikTok accounts</p>
       </div>

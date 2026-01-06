@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import InstanceCard from './InstanceCard';
+import { instanceIcons, sidebarIcons } from '../../config/icons';
 import '../../styles/Instances.css';
 
 function InstanceController() {
@@ -106,7 +107,10 @@ function InstanceController() {
     <div className="instance-controller">
       <div className="page-header">
         <div>
-          <h1 className="page-title">📱 Mobile Instances</h1>
+          <h1 className="page-title">
+            <sidebarIcons.instances size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
+            Mobile Instances
+          </h1>
           <p className="page-subtitle">
             Manage multiple TikTok accounts in mobile-sized windows
           </p>
@@ -135,21 +139,24 @@ function InstanceController() {
             onClick={() => handleStartMultiple(3)}
             disabled={instances.length >= settings.maxInstances}
           >
-            ▶️ Start 3 Instances
+            <instanceIcons.play size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            Start 3 Instances
           </button>
           <button 
             className="btn btn-secondary"
             onClick={() => handleStartMultiple(5)}
             disabled={instances.length >= settings.maxInstances}
           >
-            ▶️ Start 5 Instances
+            <instanceIcons.play size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            Start 5 Instances
           </button>
           <button 
             className="btn btn-danger"
             onClick={handleStopAll}
             disabled={instances.length === 0}
           >
-            ⏹️ Stop All
+            <instanceIcons.stop size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            Stop All
           </button>
         </div>
 
@@ -159,21 +166,24 @@ function InstanceController() {
             onClick={handleArrangeInstances}
             disabled={instances.length === 0}
           >
-            🔄 Auto-Arrange
+            <instanceIcons.refresh size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            Auto-Arrange
           </button>
           <button 
             className="btn btn-secondary"
             onClick={handleAutoScrollAll}
             disabled={instances.length === 0}
           >
-            📜 Auto Scroll All
+            <instanceIcons.scroll size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            Auto Scroll All
           </button>
           <button 
             className="btn btn-secondary"
             onClick={handleStopAutoScrollAll}
             disabled={instances.length === 0}
           >
-            ⏸️ Stop Scroll
+            <instanceIcons.pause size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            Stop Scroll
           </button>
         </div>
       </div>
@@ -185,7 +195,7 @@ function InstanceController() {
         </div>
       ) : instances.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📱</div>
+          <div className="empty-state-icon"><instanceIcons.smartphone size={64} /></div>
           <h2 className="empty-state-title">No Active Instances</h2>
           <p className="empty-state-description">
             Start mobile instances to manage multiple TikTok accounts simultaneously. 
