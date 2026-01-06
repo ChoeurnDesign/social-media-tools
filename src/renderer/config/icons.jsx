@@ -18,7 +18,6 @@ import {
   Search,
   X,
   Plus,
-  Grid3x3,
   Play,
   Square,
   RotateCw,
@@ -87,7 +86,6 @@ export const statIcons = {
 // Quick action icons
 export const actionIcons = {
   plus: Plus,
-  grid: Grid3x3,
   bot: Bot,
   chart: BarChart3,
   tag: Tag,
