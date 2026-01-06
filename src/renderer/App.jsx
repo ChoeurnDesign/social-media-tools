@@ -151,7 +151,14 @@ function App() {
 
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard 
+          onPageChange={handlePageChange} 
+          onAddAccount={() => {
+            setEditingAccount(null);
+            setShowAddAccount(true);
+            setCurrentPage('accounts');
+          }} 
+        />;
       
       case 'accounts':
         return (
@@ -297,7 +304,14 @@ function App() {
         );
       
       default:
-        return <Dashboard />;
+        return <Dashboard 
+          onPageChange={handlePageChange} 
+          onAddAccount={() => {
+            setEditingAccount(null);
+            setShowAddAccount(true);
+            setCurrentPage('accounts');
+          }} 
+        />;
     }
   };
 
