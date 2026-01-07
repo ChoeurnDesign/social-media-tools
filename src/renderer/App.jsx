@@ -6,6 +6,7 @@ import AddAccount from './components/AddAccount.jsx';
 import InstanceController from './components/instances/InstanceController';
 import Settings from './components/settings/Settings';
 import TagsManager from './components/organization/TagsManager';
+import Automation from './components/automation/Automation';
 import { sidebarIcons, actionIcons } from './config/icons';
 import './styles/variables.css';
 import './styles/App.css';
@@ -197,23 +198,7 @@ function App() {
         return <InstanceController />;
       
       case 'automation':
-        return (
-          <div className="page-header">
-            <h1 className="page-title">
-              <sidebarIcons.automation size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
-              Automation
-            </h1>
-            <p className="page-subtitle">Manage automation settings and presets</p>
-            <div className="empty-state">
-              <div className="empty-state-icon"><sidebarIcons.automation size={64} /></div>
-              <h2 className="empty-state-title">Automation Panel</h2>
-              <p className="empty-state-description">
-                Configure automation settings for your accounts. Coming soon in this view!
-                For now, automation settings are available per account.
-              </p>
-            </div>
-          </div>
-        );
+        return <Automation />;
       
       case 'analytics':
         return (
