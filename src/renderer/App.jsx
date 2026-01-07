@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Layout from './components/layout/Layout';
 import Dashboard from './components/dashboard/Dashboard';
 import AccountList from './components/AccountList.jsx';
@@ -8,6 +10,7 @@ import Settings from './components/settings/Settings';
 import TagsManager from './components/organization/TagsManager';
 import Automation from './components/automation/Automation';
 import { sidebarIcons, actionIcons } from './config/icons';
+import { toast } from './utils/toast';
 import './styles/variables.css';
 import './styles/App.css';
 
@@ -72,12 +75,13 @@ function App() {
       if (result.success) {
         await loadAccounts();
         setShowAddAccount(false);
+        toast.success(`Account "${accountData.username}" added successfully!`);
       } else {
-        alert('Failed to add account: ' + result.error);
+        toast.error(`Failed to add account: ${result.error}`);
       }
     } catch (error) {
       console.error('Error adding account:', error);
-      alert('Failed to add account');
+      toast.error('Failed to add account. Please try again.');
     }
   };
 
@@ -88,12 +92,13 @@ function App() {
         await loadAccounts();
         setEditingAccount(null);
         setShowAddAccount(false);
+        toast.success(`Account "${updates.username || 'account'}" updated successfully!`);
       } else {
-        alert('Failed to update account: ' + result.error);
+        toast.error(`Failed to update account: ${result.error}`);
       }
     } catch (error) {
       console.error('Error updating account:', error);
-      alert('Failed to update account');
+      toast.error('Failed to update account. Please try again.');
     }
   };
 
@@ -106,12 +111,13 @@ function App() {
       const result = await window.electronAPI.deleteAccount(id);
       if (result.success) {
         await loadAccounts();
+        toast.success('Account deleted successfully');
       } else {
-        alert('Failed to delete account: ' + result.error);
+        toast.error(`Failed to delete account: ${result.error}`);
       }
     } catch (error) {
       console.error('Error deleting account:', error);
-      alert('Failed to delete account');
+      toast.error('Failed to delete account. Please try again.');
     }
   };
 
@@ -121,14 +127,15 @@ function App() {
       const result = await window.electronAPI.createMobileInstance(accountId);
       if (result.success) {
         await loadAccounts();
+        toast.success('Instance opened successfully!');
         // Optionally switch to instances page
         setCurrentPage('instances');
       } else {
-        alert('Failed to open instance: ' + result.error);
+        toast.error(`Failed to open instance: ${result.error}`);
       }
     } catch (error) {
       console.error('Error opening instance:', error);
-      alert('Failed to open instance');
+      toast.error('Failed to open instance. Please try again.');
     }
   };
 
@@ -285,6 +292,14 @@ function App() {
       onThemeChange={handleThemeChange}
     >
       {renderPage()}
+      <ToastContainer
+        position="top-right"
+        theme={theme}
+        newestOnTop
+        closeButton
+        pauseOnFocusLoss
+        draggable
+      />
     </Layout>
   );
 }

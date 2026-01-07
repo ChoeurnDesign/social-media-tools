@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import InstanceCard from './InstanceCard';
 import { instanceIcons, sidebarIcons } from '../../config/icons';
+import { toast } from '../../utils/toast';
 import '../../styles/Instances.css';
 
 function InstanceController() {
@@ -13,6 +14,7 @@ function InstanceController() {
     autoArrange: true
   });
   const [loading, setLoading] = useState(true);
+  const [isStarting, setIsStarting] = useState(false);
 
   useEffect(() => {
     loadInstances();
@@ -48,14 +50,66 @@ function InstanceController() {
   };
 
   const handleStartMultiple = async (count) => {
+    setIsStarting(true);
+    const toastId = toast.loading(`Starting ${count} instances...`);
+    
     try {
       const result = await window.electronAPI.startMultipleInstances(count);
-      if (result.success) {
+      
+      if (result.success && result.data) {
+        // Parse individual results
+        const successCount = result.data.filter(r => r.success).length;
+        const failureCount = result.data.filter(r => !r.success).length;
+        
+        // Update instances list
         await loadInstances();
+        
+        // Show appropriate message based on results
+        if (failureCount === 0) {
+          // All instances started successfully
+          toast.update(toastId, {
+            render: `Successfully started ${successCount} instance${successCount !== 1 ? 's' : ''}!`,
+            type: 'success',
+            isLoading: false,
+            autoClose: 4000,
+          });
+        } else if (successCount === 0) {
+          // All instances failed
+          const firstError = result.data.find(r => !r.success)?.error || 'Unknown error';
+          toast.update(toastId, {
+            render: `Failed to start instances: ${firstError}`,
+            type: 'error',
+            isLoading: false,
+            autoClose: 6000,
+          });
+        } else {
+          // Partial success
+          const firstError = result.data.find(r => !r.success)?.error || 'Unknown error';
+          toast.update(toastId, {
+            render: `Started ${successCount} instance${successCount !== 1 ? 's' : ''} successfully. Failed to start ${failureCount}: ${firstError}`,
+            type: 'warning',
+            isLoading: false,
+            autoClose: 6000,
+          });
+        }
+      } else {
+        toast.update(toastId, {
+          render: `Failed to start instances: ${result.error || 'Unknown error'}`,
+          type: 'error',
+          isLoading: false,
+          autoClose: 6000,
+        });
       }
     } catch (error) {
       console.error('Error starting instances:', error);
-      alert('Failed to start instances');
+      toast.update(toastId, {
+        render: `Failed to start instances: ${error.message}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 6000,
+      });
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -65,16 +119,20 @@ function InstanceController() {
     try {
       await window.electronAPI.closeAllInstances();
       await loadInstances();
+      toast.success('All instances closed successfully');
     } catch (error) {
       console.error('Error closing instances:', error);
+      toast.error('Failed to close instances. Please try again.');
     }
   };
 
   const handleArrangeInstances = async () => {
     try {
       await window.electronAPI.arrangeInstances();
+      toast.info('Instances rearranged');
     } catch (error) {
       console.error('Error arranging instances:', error);
+      toast.error('Failed to arrange instances');
     }
   };
 
@@ -137,18 +195,18 @@ function InstanceController() {
           <button 
             className="btn btn-primary"
             onClick={() => handleStartMultiple(3)}
-            disabled={instances.length >= settings.maxInstances}
+            disabled={instances.length >= settings.maxInstances || isStarting}
           >
             <instanceIcons.play size={16} style={{ marginRight: '8px', display: 'inline' }} />
-            Start 3 Instances
+            {isStarting ? 'Starting...' : 'Start 3 Instances'}
           </button>
           <button 
             className="btn btn-secondary"
             onClick={() => handleStartMultiple(5)}
-            disabled={instances.length >= settings.maxInstances}
+            disabled={instances.length >= settings.maxInstances || isStarting}
           >
             <instanceIcons.play size={16} style={{ marginRight: '8px', display: 'inline' }} />
-            Start 5 Instances
+            {isStarting ? 'Starting...' : 'Start 5 Instances'}
           </button>
           <button 
             className="btn btn-danger"

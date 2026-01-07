@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sidebarIcons, actionIcons, instanceIcons } from '../../config/icons';
+import { toast } from '../../utils/toast';
 import '../../styles/Automation.css';
 
 function Automation() {
@@ -89,10 +90,11 @@ function Automation() {
       if (result.success) {
         setActiveSettings(null);
         await loadAccounts();
+        toast.success('Settings saved successfully!');
       }
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert('❌ Error: Failed to save settings');
+      toast.error('Failed to save settings. Please try again.');
     }
   };
 
@@ -104,14 +106,14 @@ function Automation() {
         
         // Show success message with auto-start info
         if (result.data?.autoStarted) {
-          alert(`✅ Success: "${presets[presetName]?.name}" preset applied and automation started!`);
+          toast.success(`"${presets[presetName]?.name}" preset applied and automation started!`);
         } else {
-          alert(`✅ Success: "${presets[presetName]?.name}" preset applied. Click "Start" to begin automation.`);
+          toast.success(`"${presets[presetName]?.name}" preset applied. Click "Start" to begin automation.`);
         }
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
-      alert('❌ Error: Failed to apply preset');
+      toast.error('Failed to apply preset. Please try again.');
     }
   };
 
@@ -134,14 +136,14 @@ function Automation() {
         const activeCount = result.data?.filter(r => r.autoStarted).length || 0;
         
         if (activeCount > 0) {
-          alert(`✅ Success: Preset applied to ${selectedAccounts.length} accounts. ${activeCount} active instances auto-started!`);
+          toast.success(`Preset applied to ${selectedAccounts.length} accounts. ${activeCount} active instances auto-started!`);
         } else {
-          alert(`✅ Success: Preset applied to ${selectedAccounts.length} accounts. Open instances and click "Start" to begin automation.`);
+          toast.success(`Preset applied to ${selectedAccounts.length} accounts. Open instances and click "Start" to begin automation.`);
         }
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
-      alert('❌ Error: Failed to apply preset');
+      toast.error('Failed to apply preset. Please try again.');
     }
   };
 
@@ -176,16 +178,17 @@ function Automation() {
       );
       
       if (!result.success) {
-        alert('❌ Error: Failed to apply preset');
+        toast.error('Failed to apply preset. Please try again.');
         return;
       }
       
       // Reload accounts to show updated status
       await loadAccounts();
+      toast.success(`Staggered automation started for ${selectedAccounts.length} accounts!`);
       
     } catch (error) {
       console.error('Failed to apply preset and start:', error);
-      alert('❌ Error: Failed to apply preset and start automation: ' + error.message);
+      toast.error(`Failed to apply preset and start automation: ${error.message}`);
     }
   };
 
@@ -194,10 +197,11 @@ function Automation() {
       const result = await window.electronAPI.startAutomation(accountId);
       if (result.success) {
         await loadAccounts();
+        toast.success('Automation started successfully!');
       }
     } catch (error) {
       console.error('Failed to start automation:', error);
-      alert('❌ Error: Failed to start automation');
+      toast.error('Failed to start automation. Please try again.');
     }
   };
 
@@ -206,10 +210,11 @@ function Automation() {
       const result = await window.electronAPI.stopAutomation(accountId);
       if (result.success) {
         await loadAccounts();
+        toast.info('Automation stopped');
       }
     } catch (error) {
       console.error('Failed to stop automation:', error);
-      alert('❌ Error: Failed to stop automation');
+      toast.error('Failed to stop automation. Please try again.');
     }
   };
 

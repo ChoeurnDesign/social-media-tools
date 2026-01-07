@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChromePicker } from 'react-color';
 import { sidebarIcons, actionIcons, accountIcons } from '../../config/icons';
+import { toast } from '../../utils/toast';
 import '../../styles/TagsManager.css';
 
 function TagsManager() {
@@ -46,7 +47,7 @@ function TagsManager() {
 
   const handleAddTag = async () => {
     if (!newTag.name.trim()) {
-      alert('Tag name is required');
+      toast.warning('Tag name is required');
       return;
     }
 
@@ -56,10 +57,11 @@ function TagsManager() {
         await loadTags();
         setShowAddTag(false);
         setNewTag({ name: '', color: '#667eea' });
+        toast.success(`Tag "${newTag.name}" created successfully!`);
       }
     } catch (error) {
       console.error('Failed to add tag:', error);
-      alert('Failed to add tag');
+      toast.error('Failed to add tag. Please try again.');
     }
   };
 
@@ -74,7 +76,7 @@ function TagsManager() {
 
   const handleBulkAssign = async () => {
     if (!selectedTag || selectedAccounts.length === 0) {
-      alert('Please select a tag and at least one account');
+      toast.warning('Please select a tag and at least one account');
       return;
     }
 
@@ -84,10 +86,10 @@ function TagsManager() {
       }
       await loadAccounts();
       setSelectedAccounts([]);
-      alert(`Tag assigned to ${selectedAccounts.length} account(s)`);
+      toast.success(`Tag assigned to ${selectedAccounts.length} account(s)!`);
     } catch (error) {
       console.error('Failed to bulk assign tags:', error);
-      alert('Failed to assign tags');
+      toast.error('Failed to assign tags. Please try again.');
     }
   };
 
