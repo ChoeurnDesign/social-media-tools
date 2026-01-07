@@ -5,6 +5,7 @@ import AccountList from './components/AccountList.jsx';
 import AddAccount from './components/AddAccount.jsx';
 import InstanceController from './components/instances/InstanceController';
 import Settings from './components/settings/Settings';
+import TagsManager from './components/organization/TagsManager';
 import { sidebarIcons, actionIcons } from './config/icons';
 import './styles/variables.css';
 import './styles/App.css';
@@ -251,22 +252,7 @@ function App() {
         );
       
       case 'tags':
-        return (
-          <div className="page-header">
-            <h1 className="page-title">
-              <sidebarIcons.tags size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
-              Tags Manager
-            </h1>
-            <p className="page-subtitle">Organize accounts with tags</p>
-            <div className="empty-state">
-              <div className="empty-state-icon"><sidebarIcons.tags size={64} /></div>
-              <h2 className="empty-state-title">Tags Manager</h2>
-              <p className="empty-state-description">
-                Create and manage tags to organize your accounts. Feature coming soon!
-              </p>
-            </div>
-          </div>
-        );
+        return <TagsManager />;
       
       case 'settings':
         return (
