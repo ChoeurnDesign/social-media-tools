@@ -112,7 +112,8 @@ function Automation() {
         // DON'T clear selection - keep checkboxes checked
         // DON'T reset preset - keep selected preset
         await loadAccounts();
-        alert(`Preset "${presetDescriptions[selectedPreset].name}" applied to ${selectedAccounts.length} account(s)`);
+        const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
+        alert(`Preset "${presetName}" applied to ${selectedAccounts.length} account(s)`);
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
@@ -154,8 +155,9 @@ function Automation() {
       await loadAccounts();
       
       // Show success message
+      const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
       alert(
-        `Preset "${presetDescriptions[selectedPreset].name}" applied and ` +
+        `Preset "${presetName}" applied and ` +
         `automation started on ${successCount} of ${selectedAccounts.length} account(s)`
       );
       
@@ -287,8 +289,8 @@ function Automation() {
           >
             <actionIcons.bot size={18} style={{ marginRight: '8px' }} />
             {selectedAccounts.length === 0 
-              ? `Select accounts to apply "${presetDescriptions[selectedPreset].name}"`
-              : `Apply "${presetDescriptions[selectedPreset].name}" & Start (${selectedAccounts.length})`
+              ? `Select accounts to apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}"`
+              : `Apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
             }
           </button>
         </div>
@@ -298,7 +300,7 @@ function Automation() {
       <div className="automation-accounts">
         {/* Bulk selection controls */}
         <div className="bulk-selection-controls">
-          <h3 className="section-title" style={{ margin: 0 }}>Account Automation Settings</h3>
+          <h3 className="section-title-no-margin">Account Automation Settings</h3>
           <div className="bulk-selection-buttons">
             <button 
               className="btn btn-sm btn-secondary"
