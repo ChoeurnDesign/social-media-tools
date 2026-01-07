@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sidebarIcons, headerIcons } from '../../config/icons';
+import { toast } from '../../utils/toast';
 import '../../styles/Settings.css';
 
 function Settings({ theme, onThemeChange }) {
@@ -62,7 +63,7 @@ function Settings({ theme, onThemeChange }) {
 
   const handleAddProxy = async () => {
     if (!newProxy.host || !newProxy.port) {
-      alert('Host and port are required');
+      toast.warning('Host and port are required');
       return;
     }
 
@@ -83,10 +84,11 @@ function Settings({ theme, onThemeChange }) {
           password: '',
           location: '',
         });
+        toast.success('Proxy added successfully!');
       }
     } catch (error) {
       console.error('Failed to add proxy:', error);
-      alert('Failed to add proxy');
+      toast.error('Failed to add proxy. Please try again.');
     }
   };
 
