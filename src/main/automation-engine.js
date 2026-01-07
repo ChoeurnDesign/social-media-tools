@@ -55,6 +55,10 @@ const DEFAULT_COMMENT_TEMPLATES = [
   '{Wow|OMG|Amazing}! {Love it|This is great}! {😍|🔥|💯}'
 ];
 
+// Instance loading timeouts
+const INSTANCE_LOAD_DELAY = 2000; // Time to wait after page load for JS initialization
+const INSTANCE_LOAD_TIMEOUT = 10000; // Maximum time to wait for page load
+
 class AutomationEngine {
   constructor(database, instanceManager) {
     this.db = database;
@@ -165,15 +169,38 @@ class AutomationEngine {
       
       // Wait for TikTok to load before applying automation
       await new Promise((resolve) => {
-        // Wait for page to finish loading
-        instance.webContents.once('did-finish-load', () => {
+        let timeoutId = null;
+        let isResolved = false;
+        
+        // Handler for when page finishes loading
+        const onLoadComplete = () => {
+          if (isResolved) return;
+          isResolved = true;
+          
+          // Clear the fallback timeout
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+          
           console.log(`Instance loaded for account ${accountId}`);
           // Give it extra time for TikTok's JavaScript to initialize
-          setTimeout(resolve, 2000);
-        });
+          setTimeout(resolve, INSTANCE_LOAD_DELAY);
+        };
+        
+        // Wait for page to finish loading
+        instance.webContents.once('did-finish-load', onLoadComplete);
         
         // Fallback timeout in case did-finish-load doesn't fire
-        setTimeout(resolve, 10000);
+        timeoutId = setTimeout(() => {
+          if (isResolved) return;
+          isResolved = true;
+          
+          // Remove the event listener to prevent it from firing later
+          instance.webContents.removeListener('did-finish-load', onLoadComplete);
+          
+          console.log(`Instance load timeout for account ${accountId}, proceeding anyway`);
+          resolve();
+        }, INSTANCE_LOAD_TIMEOUT);
       });
     }
 
