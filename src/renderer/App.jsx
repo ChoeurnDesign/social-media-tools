@@ -4,6 +4,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import AccountList from './components/AccountList.jsx';
 import AddAccount from './components/AddAccount.jsx';
 import InstanceController from './components/instances/InstanceController';
+import Settings from './components/settings/Settings';
 import { sidebarIcons, actionIcons } from './config/icons';
 import './styles/variables.css';
 import './styles/App.css';
@@ -269,20 +270,10 @@ function App() {
       
       case 'settings':
         return (
-          <div className="page-header">
-            <h1 className="page-title">
-              <sidebarIcons.settings size={28} style={{ display: 'inline', marginRight: '12px', verticalAlign: 'middle' }} />
-              Settings
-            </h1>
-            <p className="page-subtitle">Configure application settings</p>
-            <div className="empty-state">
-              <div className="empty-state-icon"><sidebarIcons.settings size={64} /></div>
-              <h2 className="empty-state-title">Settings</h2>
-              <p className="empty-state-description">
-                Application settings and preferences. Feature coming soon!
-              </p>
-            </div>
-          </div>
+          <Settings 
+            theme={theme}
+            onThemeChange={handleThemeChange}
+          />
         );
       
       case 'export':
