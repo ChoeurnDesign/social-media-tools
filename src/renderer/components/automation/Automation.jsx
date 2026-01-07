@@ -109,8 +109,8 @@ function Automation() {
         selectedPreset
       );
       if (result.success) {
-        // DON'T clear selection - keep checkboxes checked
-        // DON'T reset preset - keep selected preset
+        // Keep selection to improve user workflow and enable consecutive operations
+        // This allows users to quickly reapply different presets to the same accounts
         await loadAccounts();
         const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
         alert(`Preset "${presetName}" applied to ${selectedAccounts.length} account(s)`);
@@ -161,8 +161,8 @@ function Automation() {
         `automation started on ${successCount} of ${selectedAccounts.length} account(s)`
       );
       
-      // Keep selection for easy re-use
-      // Don't clear: setSelectedAccounts([]);
+      // Keep selection for easy re-use and consecutive operations
+      // This allows users to quickly reapply different presets without reselecting accounts
       
     } catch (error) {
       console.error('Failed to apply preset and start:', error);
