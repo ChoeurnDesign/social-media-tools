@@ -166,7 +166,7 @@ class InstanceManager {
     // iPhone 13 dimensions
     const instanceWidth = 390;
     const instanceHeight = 844;
-    const gap = 10; // Gap between windows
+    const gap = 0; // No gap - windows perfectly touching
 
     // Calculate how many instances fit per row
     const instancesPerRow = Math.floor(screenWidth / (instanceWidth + gap));
