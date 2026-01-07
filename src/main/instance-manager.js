@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, screen } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -156,23 +156,51 @@ class InstanceManager {
   }
 
   arrangeInstances() {
-    const columns = this.settings.instancesPerRow;
-    const spacing = this.settings.spacing;
+    const instances = Array.from(this.instances.values());
+    if (instances.length === 0) return;
 
-    let index = 0;
-    for (const [accountId, window] of this.instances) {
-      if (!window.isDestroyed()) {
-        const bounds = window.getBounds();
-        const column = index % columns;
-        const row = Math.floor(index / columns);
+    // Get screen dimensions
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
 
-        const x = 100 + (column * (bounds.width + spacing));
-        const y = 100 + (row * (bounds.height + spacing));
+    // iPhone 13 dimensions
+    const instanceWidth = 390;
+    const instanceHeight = 844;
+    const gap = 10; // Gap between windows
 
-        window.setBounds({ x, y, width: bounds.width, height: bounds.height });
-        index++;
+    // Calculate how many instances fit per row
+    const instancesPerRow = Math.floor(screenWidth / (instanceWidth + gap));
+
+    // Position each instance in a grid
+    instances.forEach((instance, index) => {
+      if (instance.isDestroyed()) return;
+
+      // Calculate row and column
+      const row = Math.floor(index / instancesPerRow);
+      const col = index % instancesPerRow;
+
+      // Calculate x and y positions
+      const x = col * (instanceWidth + gap);
+      const y = row * (instanceHeight + gap);
+
+      // Check if instance fits on screen
+      if (y + instanceHeight > screenHeight) {
+        // Instance would be off-screen, skip or handle differently
+        console.warn(`Instance ${index} would be off-screen at y: ${y}`);
+        return;
       }
-    }
+
+      // Set bounds
+      instance.setBounds({
+        x: Math.round(x),
+        y: Math.round(y),
+        width: instanceWidth,
+        height: instanceHeight
+      });
+
+      // Bring to front
+      instance.show();
+    });
   }
 
   async startMultipleInstances(accounts, count = 3) {
