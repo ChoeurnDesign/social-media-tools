@@ -107,12 +107,22 @@ npm run build:linux  # Linux only
 
 1. Navigate to **👥 Accounts** in the sidebar
 2. Click **"+ Add Account"** button
-3. Enter TikTok credentials:
-   - Username (required)
-   - Email (optional)
-   - Password (required)
-   - Nickname (optional display name)
+3. Enter account information:
+   - **Nickname/Label** (required) - A friendly name to identify this account (e.g., "My Personal Account")
+   - **Username** (optional) - Your TikTok username for display purposes only
 4. Click **"Add Account"** to save
+
+**Important:** TikTok uses OAuth (Google, Facebook, Apple) for authentication, not username/password. After adding an account, you'll need to log in via TikTok's social login.
+
+### Logging Into Accounts
+
+1. **Find the account** in your list
+2. **Click the "🚀 Login" button** on the account card
+3. A mobile instance window will open with TikTok
+4. **Log in normally** using TikTok's OAuth options (Google, Facebook, Apple, etc.)
+5. The session is automatically saved
+
+Next time you click login, you'll be logged in automatically!
 
 ### Opening Mobile Instances
 
@@ -126,31 +136,33 @@ npm run build:linux  # Linux only
 
 1. Navigate to **🤖 Automation** in the sidebar
 2. Select an automation preset:
-   - **Organic** (recommended for beginners)
-   - **Aggressive** (maximum growth)
-   - **Engagement** (focus on interaction)
-   - **Conservative** (minimal automation)
-3. Configure settings per account
-4. Use **"Auto Scroll All"** to start automation on all instances
+   - **🌿 Organic** (recommended for beginners) - Natural, human-like behavior
+   - **🔥 Aggressive** (maximum growth) - High engagement, higher risk
+   - **💬 Engagement** (focus on interaction) - Likes and comments
+   - **🛡️ Conservative** (minimal automation) - Safest approach
+3. Click on accounts to configure individual settings
+4. Use **"Apply Preset"** to apply settings to multiple accounts at once
+5. Click **"Start"** on individual accounts to begin automation
 
-### Organizing Accounts
+### Managing Tags
 
 1. Navigate to **🏷️ Tags Manager**
-2. Create tags: `personal`, `business`, `testing`, etc.
-3. Assign tags to accounts for easy filtering
-4. Use groups to create folders of related accounts
+2. Click **"Add Tag"** to create new tags
+3. Choose a color for easy identification
+4. Select accounts and assign tags for organization
+5. Use tag filters to quickly find specific groups of accounts
 
-Your credentials are immediately encrypted with AES-256 before being stored locally.
+### Configuring Settings
 
-### Logging Into an Account
+1. Navigate to **⚙️ Settings** in the sidebar
+2. Configure:
+   - **General:** Theme, language, startup behavior
+   - **Mobile Instances:** Default device, grid layout
+   - **Automation:** Global limits, safety delays
+   - **Proxies:** Add and manage proxy servers
+   - **Data Management:** Export, import, backup
 
-1. **Find the account** in your list (use search if you have many)
-2. **Click the "🚀 Login" button** on the account card
-3. A new window will open with TikTok
-4. **Log in normally** in the browser window
-5. The session is automatically saved
-
-Next time you click login, you'll be logged in automatically!
+Your credentials are encrypted and stored locally on your device.
 
 ### Managing Accounts
 
@@ -333,7 +345,7 @@ The app uses SQLite with the following tables:
 
 ## 🆕 What's New in Version 2.0
 
-### Major Features
+### Major Features ✅
 - ✅ **SQLite Database** - Professional backend replacing JSON storage
 - ✅ **Mobile Instance System** - Open multiple TikTok windows simultaneously
 - ✅ **Automation Engine** - Auto-scroll, auto-like, auto-follow, auto-comment
@@ -341,8 +353,17 @@ The app uses SQLite with the following tables:
 - ✅ **Dashboard** - Real-time statistics with gradient cards
 - ✅ **Dark/Light Themes** - Complete CSS variable system
 - ✅ **Migration System** - Automatic upgrade from v1.0
+- ✅ **Settings Page** - Comprehensive configuration for all app features
+- ✅ **Tags Manager** - Full tag management with color coding and filtering
+- ✅ **Automation UI** - Complete automation control panel with presets
+
+### OAuth Authentication Flow ✅
+- ✅ **Removed password requirement** - TikTok uses OAuth (Google, Facebook, Apple)
+- ✅ **Simplified account creation** - Only nickname/label required
+- ✅ **Better UX** - Clear instructions on authentication flow
 
 ### Breaking Changes
+- **Authentication:** Accounts no longer require passwords. Use TikTok's OAuth login after creating accounts.
 - Database migrated from JSON to SQLite (automatic migration on first launch)
 - Login now opens mobile instances instead of full browser windows
 - New IPC API (backward compatible with old methods)
@@ -353,9 +374,20 @@ The app uses SQLite with the following tables:
 - Optimized rendering with React 19
 - Lazy loading for large account lists
 
+### Completed Features
+- 📊 Settings page with 6 sections (General, Instances, Automation, Proxies, Data, About)
+- 🏷️ Full tags manager with color picker and bulk operations
+- 🤖 Complete automation UI with 4 presets and granular controls
+- 🔐 Improved security with optional password storage
+- 💾 Content queue database schema ready
+- ⚙️ App settings persistence
+
 ### Coming Soon
 - 📊 Advanced analytics with charts (Recharts integration)
-- 🏷️ Full tags and groups manager UI
+- 🎥 Content queue for scheduled uploads
+- 📤 Import/Export functionality implementation
+- 🗂️ Groups/folders manager UI
+- 📈 Enhanced dashboard with activity feed and trends
 - 📤 Import/Export functionality
 - 🎥 Content queue for scheduled uploads
 - ⚙️ Comprehensive settings panel
