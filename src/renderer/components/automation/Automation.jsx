@@ -101,6 +101,13 @@ function Automation() {
       const result = await window.electronAPI.applyAutomationPreset(accountId, presetName);
       if (result.success) {
         await loadAccounts();
+        
+        // Show success message with auto-start info
+        if (result.data?.autoStarted) {
+          alert(`✅ Success: "${presets[presetName]?.name}" preset applied and automation started!`);
+        } else {
+          alert(`✅ Success: "${presets[presetName]?.name}" preset applied. Click "Start" to begin automation.`);
+        }
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
@@ -122,6 +129,15 @@ function Automation() {
         // Keep selection to improve user workflow and enable consecutive operations
         // This allows users to quickly reapply different presets to the same accounts
         await loadAccounts();
+        
+        // Count how many had active instances
+        const activeCount = result.data?.filter(r => r.autoStarted).length || 0;
+        
+        if (activeCount > 0) {
+          alert(`✅ Success: Preset applied to ${selectedAccounts.length} accounts. ${activeCount} active instances auto-started!`);
+        } else {
+          alert(`✅ Success: Preset applied to ${selectedAccounts.length} accounts. Open instances and click "Start" to begin automation.`);
+        }
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
@@ -294,6 +310,9 @@ function Automation() {
             className="btn btn-primary"
             onClick={handleBulkApplyPresetAndStart}
             disabled={selectedAccounts.length === 0}
+            title={selectedAccounts.length === 0 
+              ? "Select accounts from the list below to apply automation preset" 
+              : `Apply "${presets[selectedPreset]?.name}" preset and start automation for selected accounts`}
           >
             <actionIcons.bot size={18} style={{ marginRight: '8px' }} />
             {selectedAccounts.length === 0 
@@ -301,6 +320,9 @@ function Automation() {
               : `Apply "${presets[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
             }
           </button>
+          <p className="help-text" style={{ marginTop: '12px', fontSize: '13px', color: '#888' }}>
+            💡 <strong>Tip:</strong> Select accounts below, choose a preset above, then click this button to apply settings and start automation automatically.
+          </p>
         </div>
       </div>
 
@@ -382,6 +404,7 @@ function Automation() {
                   <button
                     className="btn btn-secondary btn-sm"
                     onClick={() => handleLoadSettings(account.id)}
+                    title="Configure custom automation settings for this account"
                   >
                     <actionIcons.bot size={16} style={{ marginRight: '6px' }} />
                     Configure
@@ -391,6 +414,7 @@ function Automation() {
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => handleStopAutomation(account.id)}
+                      title="Stop automation for this account"
                     >
                       <instanceIcons.stop size={16} style={{ marginRight: '6px' }} />
                       Stop
@@ -399,6 +423,7 @@ function Automation() {
                     <button
                       className="btn btn-success btn-sm"
                       onClick={() => handleStartAutomation(account.id)}
+                      title="Open TikTok instance and start automation for this account"
                     >
                       <instanceIcons.play size={16} style={{ marginRight: '6px' }} />
                       Start

@@ -102,10 +102,33 @@ class AutomationEngine {
     // Update database
     this.db.updateAutomationSettings(accountId, randomizedSettings);
 
-    // Apply to active instance if exists
-    await this.applyToInstance(accountId);
+    // Check if instance is active
+    const instance = this.instanceManager.instances.get(accountId);
+    const hasActiveInstance = instance && !instance.isDestroyed();
 
-    return { success: true, preset: presetName, settings: randomizedSettings };
+    // Apply to active instance if exists AND auto-start automation
+    if (hasActiveInstance) {
+      await this.applyToInstance(accountId);
+      
+      // Auto-start automation for active instances
+      console.log(`Auto-starting automation for active instance ${accountId}`);
+      this.activeAutomations.set(accountId, { 
+        active: true, 
+        startedAt: new Date() 
+      });
+      
+      this.db.logActivity(accountId, 'automation_started', { 
+        preset: presetName,
+        autoStarted: true 
+      });
+    }
+
+    return { 
+      success: true, 
+      preset: presetName, 
+      settings: randomizedSettings,
+      autoStarted: hasActiveInstance
+    };
   }
 
   async applyToInstance(accountId) {
@@ -270,8 +293,12 @@ class AutomationEngine {
     
     for (const accountId of accountIds) {
       try {
-        await this.applyPreset(accountId, presetName);
-        results.push({ accountId, success: true });
+        const result = await this.applyPreset(accountId, presetName);
+        results.push({ 
+          accountId, 
+          success: true, 
+          autoStarted: result.autoStarted 
+        });
       } catch (error) {
         results.push({ accountId, success: false, error: error.message });
       }
