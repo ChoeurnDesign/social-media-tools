@@ -51,6 +51,7 @@ function InstanceController() {
 
   const handleStartMultiple = async (count) => {
     setIsStarting(true);
+    let toastId = null;
     
     try {
       // ✅ PRE-CHECK: Get accounts first
@@ -84,7 +85,7 @@ function InstanceController() {
         toast.info(`Only ${actualCount} inactive account${actualCount !== 1 ? 's' : ''} available. Starting all...`);
       }
       
-      const toastId = toast.loading(`Starting ${actualCount} instance${actualCount !== 1 ? 's' : ''}...`);
+      toastId = toast.loading(`Starting ${actualCount} instance${actualCount !== 1 ? 's' : ''}...`);
       
       const result = await window.electronAPI.startMultipleInstances(count);
       
@@ -137,6 +138,10 @@ function InstanceController() {
       }
     } catch (error) {
       console.error('Error starting instances:', error);
+      // Dismiss loading toast if it exists
+      if (toastId) {
+        toast.dismiss(toastId);
+      }
       toast.error(`Failed to start instances: ${error.message}`);
     } finally {
       setIsStarting(false);
