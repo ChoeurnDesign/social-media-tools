@@ -5,6 +5,7 @@ import '../../styles/Automation.css';
 function Automation() {
   const [accounts, setAccounts] = useState([]);
   const [presets, setPresets] = useState({});
+  const [devicePresets, setDevicePresets] = useState({});
   const [selectedAccounts, setSelectedAccounts] = useState([]);
   const [selectedPreset, setSelectedPreset] = useState('organic');
   const [activeSettings, setActiveSettings] = useState(null);
@@ -25,6 +26,7 @@ function Automation() {
   useEffect(() => {
     loadAccounts();
     loadPresets();
+    loadDevicePresets();
   }, []);
 
   const loadAccounts = async () => {
@@ -46,6 +48,17 @@ function Automation() {
       }
     } catch (error) {
       console.error('Failed to load presets:', error);
+    }
+  };
+
+  const loadDevicePresets = async () => {
+    try {
+      const result = await window.electronAPI.getDevicePresets();
+      if (result.success) {
+        setDevicePresets(result.data);
+      }
+    } catch (error) {
+      console.error('Failed to load device presets:', error);
     }
   };
 
@@ -74,13 +87,12 @@ function Automation() {
         settingsForm
       );
       if (result.success) {
-        alert('Settings saved successfully!');
         setActiveSettings(null);
         await loadAccounts();
       }
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert('Failed to save settings');
+      alert('❌ Error: Failed to save settings');
     }
   };
 
@@ -89,17 +101,15 @@ function Automation() {
       const result = await window.electronAPI.applyAutomationPreset(accountId, presetName);
       if (result.success) {
         await loadAccounts();
-        alert(`Preset "${presetName}" applied to account`);
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
-      alert('Failed to apply preset');
+      alert('❌ Error: Failed to apply preset');
     }
   };
 
   const handleBulkApplyPreset = async () => {
     if (selectedAccounts.length === 0) {
-      alert('Please select at least one account');
       return;
     }
 
@@ -112,18 +122,15 @@ function Automation() {
         // Keep selection to improve user workflow and enable consecutive operations
         // This allows users to quickly reapply different presets to the same accounts
         await loadAccounts();
-        const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
-        alert(`Preset "${presetName}" applied to ${selectedAccounts.length} account(s)`);
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
-      alert('Failed to apply preset');
+      alert('❌ Error: Failed to apply preset');
     }
   };
 
   const handleBulkApplyPresetAndStart = async () => {
     if (selectedAccounts.length === 0) {
-      alert('Please select at least one account');
       return;
     }
 
@@ -146,39 +153,23 @@ function Automation() {
       
       console.log('Starting staggered automation for accounts:', selectedAccounts);
       
-      // ✅ Use staggered start with anti-detection
+      // Use staggered start with anti-detection
       const result = await window.electronAPI.bulkApplyPresetStaggered(
         selectedAccounts,
         selectedPreset
       );
       
       if (!result.success) {
-        alert('Failed to apply preset');
+        alert('❌ Error: Failed to apply preset');
         return;
       }
-
-      const { startResults } = result.data;
-      const successCount = startResults.filter(r => r.success).length;
       
       // Reload accounts to show updated status
       await loadAccounts();
       
-      // Show success message
-      const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
-      alert(
-        `✅ Anti-Detection Mode Active!\n\n` +
-        `${successCount} of ${selectedAccounts.length} accounts started.\n\n` +
-        `Each account is using:\n` +
-        `• Random device type\n` +
-        `• Unique user agent\n` +
-        `• Randomized behavior\n` +
-        `• Staggered opening times\n\n` +
-        `Preset "${presetName}" applied successfully.`
-      );
-      
     } catch (error) {
       console.error('Failed to apply preset and start:', error);
-      alert('❌ Failed to apply preset and start automation: ' + error.message);
+      alert('❌ Error: Failed to apply preset and start automation: ' + error.message);
     }
   };
 
@@ -186,12 +177,11 @@ function Automation() {
     try {
       const result = await window.electronAPI.startAutomation(accountId);
       if (result.success) {
-        alert('Automation started');
         await loadAccounts();
       }
     } catch (error) {
       console.error('Failed to start automation:', error);
-      alert('Failed to start automation');
+      alert('❌ Error: Failed to start automation');
     }
   };
 
@@ -199,12 +189,11 @@ function Automation() {
     try {
       const result = await window.electronAPI.stopAutomation(accountId);
       if (result.success) {
-        alert('Automation stopped');
         await loadAccounts();
       }
     } catch (error) {
       console.error('Failed to stop automation:', error);
-      alert('Failed to stop automation');
+      alert('❌ Error: Failed to stop automation');
     }
   };
 
@@ -235,33 +224,6 @@ function Automation() {
     }));
   };
 
-  const presetDescriptions = {
-    organic: {
-      name: 'Organic',
-      icon: '🌿',
-      description: 'Natural, human-like behavior with moderate engagement',
-      color: '#4caf50',
-    },
-    aggressive: {
-      name: 'Aggressive',
-      icon: '🔥',
-      description: 'Maximum engagement for rapid growth (higher risk)',
-      color: '#e94560',
-    },
-    engagement: {
-      name: 'Engagement',
-      icon: '💬',
-      description: 'Focus on likes and comments for better interaction',
-      color: '#667eea',
-    },
-    conservative: {
-      name: 'Conservative',
-      icon: '🛡️',
-      description: 'Minimal automation, safest approach',
-      color: '#9e9e9e',
-    },
-  };
-
   return (
     <div className="automation-page">
       <div className="page-header">
@@ -278,7 +240,7 @@ function Automation() {
       <div className="presets-section">
         <h3 className="section-title">Automation Presets</h3>
         <div className="presets-grid">
-          {Object.entries(presetDescriptions).map(([key, preset]) => (
+          {Object.entries(presets).map(([key, preset]) => (
             <div
               key={key}
               className={`preset-card ${selectedPreset === key ? 'active' : ''}`}
@@ -289,6 +251,40 @@ function Automation() {
               </div>
               <h4 className="preset-name">{preset.name}</h4>
               <p className="preset-description">{preset.description}</p>
+              
+              {/* Preset Settings Preview */}
+              <div className="preset-settings-preview">
+                <div className="setting-preview-item">
+                  <span>📜</span>
+                  <span>Scroll: {preset.autoScroll.speed}ms</span>
+                </div>
+                <div className="setting-preview-item">
+                  <span>❤️</span>
+                  <span>Like: {(preset.autoLike.probability * 100).toFixed(0)}%</span>
+                </div>
+                {preset.autoFollow.enabled ? (
+                  <div className="setting-preview-item">
+                    <span>➕</span>
+                    <span>Follow: {preset.autoFollow.dailyLimit}/day</span>
+                  </div>
+                ) : (
+                  <div className="setting-preview-item disabled">
+                    <span>➕</span>
+                    <span>No follows</span>
+                  </div>
+                )}
+                {preset.autoComment.enabled ? (
+                  <div className="setting-preview-item">
+                    <span>💬</span>
+                    <span>Comment: {(preset.autoComment.probability * 100).toFixed(0)}%</span>
+                  </div>
+                ) : (
+                  <div className="setting-preview-item disabled">
+                    <span>💬</span>
+                    <span>No comments</span>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -301,8 +297,8 @@ function Automation() {
           >
             <actionIcons.bot size={18} style={{ marginRight: '8px' }} />
             {selectedAccounts.length === 0 
-              ? `Select accounts to apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}"`
-              : `Apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
+              ? `Select accounts to apply "${presets[selectedPreset]?.name || selectedPreset}"`
+              : `Apply "${presets[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
             }
           </button>
         </div>
@@ -348,13 +344,35 @@ function Automation() {
                   <div className="account-info">
                     <h4 className="account-name">{account.nickname || account.username}</h4>
                     {account.username && <p className="account-username">@{account.username}</p>}
+                    
+                    {/* Device Info */}
+                    {account.device_type && devicePresets[account.device_type] && (
+                      <div className="account-device">
+                        <span className="device-icon">📱</span>
+                        <span className="device-name">
+                          {devicePresets[account.device_type].name}
+                        </span>
+                        <span className="device-size">
+                          ({devicePresets[account.device_type].width}×{devicePresets[account.device_type].height})
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Automation Status */}
+                    {account.status === 'active' && account.auto_scroll === 1 && (
+                      <div className="automation-status-live">
+                        <span className="status-pulse">⚡</span>
+                        <span>Scrolling ({account.scroll_speed}ms)</span>
+                      </div>
+                    )}
+                    
                     {/* Show current preset */}
                     {account.preset && (
                       <span 
                         className="preset-badge" 
-                        style={{ backgroundColor: presetDescriptions[account.preset]?.color || '#666' }}
+                        style={{ backgroundColor: presets[account.preset]?.color || '#666' }}
                       >
-                        {presetDescriptions[account.preset]?.name || account.preset}
+                        {presets[account.preset]?.icon} {presets[account.preset]?.name || account.preset}
                       </span>
                     )}
                   </div>

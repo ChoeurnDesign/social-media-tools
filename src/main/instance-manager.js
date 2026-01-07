@@ -336,12 +336,23 @@ class InstanceManager {
     const active = [];
     for (const [accountId, window] of this.instances) {
       if (!window.isDestroyed()) {
+        // Get device type for this account
+        const deviceType = this.db.getAccountDevice(accountId);
+        const devicePreset = DEVICE_PRESETS[deviceType] || DEVICE_PRESETS.iphone13;
+        
+        // Get automation settings
+        const automationSettings = this.db.getAutomationSettings(accountId);
+        
         active.push({
           accountId,
           title: window.getTitle(),
           bounds: window.getBounds(),
           isVisible: window.isVisible(),
-          isFocused: window.isFocused()
+          isFocused: window.isFocused(),
+          deviceName: devicePreset.name,
+          deviceType: deviceType,
+          automationActive: automationSettings?.auto_scroll === 1,
+          scrollSpeed: automationSettings?.scroll_speed || 100
         });
       }
     }
