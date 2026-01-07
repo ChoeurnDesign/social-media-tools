@@ -87,7 +87,8 @@ function InstanceController() {
       
       toastId = toast.loading(`Starting ${actualCount} instance${actualCount !== 1 ? 's' : ''}...`);
       
-      const result = await window.electronAPI.startMultipleInstances(count);
+      // Use actualCount to match the number of available inactive accounts
+      const result = await window.electronAPI.startMultipleInstances(actualCount);
       
       if (result.success && result.data) {
         // Parse individual results
@@ -125,8 +126,14 @@ function InstanceController() {
             autoClose: 6000,
           });
         } else {
-          // No results at all (shouldn't happen with pre-checks)
-          toast.dismiss(toastId);
+          // Empty results array - log for debugging
+          console.warn('Received empty results array from startMultipleInstances');
+          toast.update(toastId, {
+            render: '⚠️ No instances were started. Please try again.',
+            type: 'warning',
+            isLoading: false,
+            autoClose: 5000,
+          });
         }
       } else {
         toast.update(toastId, {
