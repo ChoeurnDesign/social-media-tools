@@ -439,6 +439,80 @@ function setupIpcHandlers() {
     }
   });
 
+  // ============ Content Queue ============
+  
+  // Add to content queue
+  ipcMain.handle('add-to-content-queue', async (event, queueData) => {
+    try {
+      const item = database.addToContentQueue(queueData);
+      return { success: true, data: item };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get content queue
+  ipcMain.handle('get-content-queue', async (event, accountId) => {
+    try {
+      const queue = database.getContentQueue(accountId);
+      return { success: true, data: queue };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Update content queue status
+  ipcMain.handle('update-content-queue-status', async (event, id, status, postedAt) => {
+    try {
+      database.updateContentQueueStatus(id, status, postedAt);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Delete from content queue
+  ipcMain.handle('delete-from-content-queue', async (event, id) => {
+    try {
+      database.deleteFromContentQueue(id);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ============ Settings ============
+  
+  // Get setting
+  ipcMain.handle('get-setting', async (event, key, defaultValue) => {
+    try {
+      const value = database.getSetting(key, defaultValue);
+      return { success: true, data: value };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Set setting
+  ipcMain.handle('set-setting', async (event, key, value) => {
+    try {
+      database.setSetting(key, value);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get all settings
+  ipcMain.handle('get-all-settings', async () => {
+    try {
+      const settings = database.getAllSettings();
+      return { success: true, data: settings };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
   // ============ Legacy Handlers (for backward compatibility) ============
   
   // Open login window (old method)

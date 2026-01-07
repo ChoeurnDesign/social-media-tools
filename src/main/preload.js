@@ -49,6 +49,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getProxies: () => ipcRenderer.invoke('get-proxies'),
   assignProxyToAccount: (accountId, proxyId) => ipcRenderer.invoke('assign-proxy-to-account', accountId, proxyId),
   
+  // Content Queue
+  addToContentQueue: (queueData) => ipcRenderer.invoke('add-to-content-queue', queueData),
+  getContentQueue: (accountId) => ipcRenderer.invoke('get-content-queue', accountId),
+  updateContentQueueStatus: (id, status, postedAt) => ipcRenderer.invoke('update-content-queue-status', id, status, postedAt),
+  deleteFromContentQueue: (id) => ipcRenderer.invoke('delete-from-content-queue', id),
+  
+  // Settings
+  getSetting: (key, defaultValue) => ipcRenderer.invoke('get-setting', key, defaultValue),
+  setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value),
+  getAllSettings: () => ipcRenderer.invoke('get-all-settings'),
+  
   // Legacy session management
   openLogin: (accountId) => ipcRenderer.invoke('open-login', accountId),
   closeSession: (accountId) => ipcRenderer.invoke('close-session', accountId),
