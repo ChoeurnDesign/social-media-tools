@@ -4,45 +4,45 @@
  */
 
 const AUTOMATION_PRESETS = {
-  aggressive: {
-    name: 'Aggressive Growth',
-    description: 'Maximum engagement for rapid growth',
-    autoScroll: { enabled: true, speed: 50 },
-    autoLike: { enabled: true, probability: 0.5 },
-    autoFollow: { enabled: true, dailyLimit: 200 },
-    autoComment: { enabled: true, probability: 0.3, dailyLimit: 100 }
-  },
   organic: {
-    name: 'Organic Growth',
-    description: 'Natural engagement patterns',
+    name: 'Organic',
+    description: 'Natural, human-like behavior with moderate engagement',
+    icon: '🌿',
+    color: '#4ade80',
     autoScroll: { enabled: true, speed: 150 },
     autoLike: { enabled: true, probability: 0.2 },
     autoFollow: { enabled: true, dailyLimit: 50 },
     autoComment: { enabled: true, probability: 0.1, dailyLimit: 30 }
   },
+  aggressive: {
+    name: 'Aggressive',
+    description: 'Maximum engagement for rapid growth (higher risk)',
+    icon: '🔥',
+    color: '#ef4444',
+    autoScroll: { enabled: true, speed: 50 },
+    autoLike: { enabled: true, probability: 0.5 },
+    autoFollow: { enabled: true, dailyLimit: 200 },
+    autoComment: { enabled: true, probability: 0.3, dailyLimit: 100 }
+  },
   engagement: {
-    name: 'High Engagement',
-    description: 'Focus on likes and comments',
+    name: 'Engagement',
+    description: 'Focus on likes and comments for better interaction',
+    icon: '💬',
+    color: '#60a5fa',
     autoScroll: { enabled: true, speed: 100 },
     autoLike: { enabled: true, probability: 0.4 },
-    autoFollow: { enabled: false },
-    autoComment: { enabled: true, probability: 0.5, dailyLimit: 50 }
+    autoFollow: { enabled: false, dailyLimit: 0 },
+    autoComment: { enabled: true, probability: 0.4, dailyLimit: 150 }
   },
   conservative: {
     name: 'Conservative',
-    description: 'Minimal automation to avoid detection',
+    description: 'Minimal automation, safest approach',
+    icon: '🛡️',
+    color: '#94a3b8',
     autoScroll: { enabled: true, speed: 200 },
     autoLike: { enabled: true, probability: 0.1 },
-    autoFollow: { enabled: false },
-    autoComment: { enabled: false }
-  },
-  custom: {
-    name: 'Custom',
-    description: 'User-defined settings',
-    autoScroll: { enabled: false, speed: 100 },
-    autoLike: { enabled: false, probability: 0.3 },
-    autoFollow: { enabled: false, dailyLimit: 100 },
-    autoComment: { enabled: false, probability: 0.2, dailyLimit: 50 }
+    autoFollow: { enabled: false, dailyLimit: 0 },
+    autoComment: { enabled: false, probability: 0, dailyLimit: 0 }
   }
 };
 

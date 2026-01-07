@@ -36,8 +36,26 @@ function InstanceCard({ instance, onRefresh }) {
           <span className="info-label">Size:</span>
           <span className="info-value">{instance.bounds.width} × {instance.bounds.height}</span>
         </div>
+        
+        {/* Device Info */}
+        <div className="info-row">
+          <span className="info-label">Device:</span>
+          <span className="info-value">{instance.deviceName || 'Unknown'}</span>
+        </div>
+        
+        {/* Automation Status */}
         <div className="info-row">
           <span className="info-label">Status:</span>
+          <span className="info-value">
+            {instance.automationActive 
+              ? `⚡ Auto-scrolling (${instance.scrollSpeed}ms)`
+              : 'Idle'
+            }
+          </span>
+        </div>
+        
+        <div className="info-row">
+          <span className="info-label">Visibility:</span>
           <span className={`status-badge ${instance.isVisible ? 'visible' : 'hidden'}`}>
             {instance.isVisible ? (
               <>

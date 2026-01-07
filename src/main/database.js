@@ -253,9 +253,13 @@ class DatabaseManager {
     const stmt = this.db.prepare(`
       SELECT 
         a.*,
+        ast.auto_scroll,
+        ast.scroll_speed,
+        ast.preset,
         GROUP_CONCAT(DISTINCT t.name) as tags,
         GROUP_CONCAT(DISTINCT g.name) as groups
       FROM accounts a
+      LEFT JOIN automation_settings ast ON a.id = ast.account_id
       LEFT JOIN account_tags at ON a.id = at.account_id
       LEFT JOIN tags t ON at.tag_id = t.id
       LEFT JOIN account_groups ag ON a.id = ag.account_id
