@@ -24,9 +24,13 @@ function startAutoScroll(speed = 100) {
     clearInterval(autoScrollInterval);
   }
 
+  console.log(`🔄 Auto-scroll started at speed ${speed}ms`);
+
   autoScrollInterval = setInterval(() => {
     // Random scroll amount (human-like)
     const scrollAmount = 50 + Math.random() * 50;
+    
+    console.log(`📜 Scrolling ${Math.round(scrollAmount)}px`);
     
     window.scrollBy({
       top: scrollAmount,
@@ -35,6 +39,7 @@ function startAutoScroll(speed = 100) {
     
     // Loop back to top when reaching bottom
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+      console.log('🔁 Reached bottom, scrolling back to top');
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 1000 + Math.random() * 2000);
@@ -59,6 +64,7 @@ function startAutoScroll(speed = 100) {
 
 function stopAutoScroll() {
   if (autoScrollInterval) {
+    console.log('⏹️ Auto-scroll stopped');
     clearInterval(autoScrollInterval);
     autoScrollInterval = null;
   }
@@ -175,35 +181,43 @@ function processSpinSyntax(text) {
 
 // Listen for automation commands from main process
 ipcRenderer.on('automation-command', (event, data) => {
+  console.log('🤖 Automation command received:', data);
+  
   const { command, ...params } = data;
 
   switch (command) {
     case 'start-auto-scroll':
+      console.log('▶️ Starting auto-scroll with speed:', params.speed || automationSettings.scrollSpeed);
       startAutoScroll(params.speed || automationSettings.scrollSpeed);
       break;
     
     case 'stop-auto-scroll':
+      console.log('⏹️ Stopping auto-scroll');
       stopAutoScroll();
       break;
     
     case 'update-settings':
+      console.log('⚙️ Updating automation settings:', params.settings);
       automationSettings = { ...automationSettings, ...params.settings };
       break;
     
     case 'trigger-like':
+      console.log('❤️ Triggering like');
       tryAutoLike();
       break;
     
     case 'trigger-follow':
+      console.log('➕ Triggering follow');
       tryAutoFollow();
       break;
     
     case 'trigger-comment':
+      console.log('💬 Triggering comment');
       tryAutoComment();
       break;
     
     default:
-      console.log('Unknown automation command:', command);
+      console.log('❓ Unknown automation command:', command);
   }
 });
 
