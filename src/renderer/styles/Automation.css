@@ -21,6 +21,13 @@
   margin: 0 0 1.5rem 0;
 }
 
+.section-title-no-margin {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
 .presets-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -464,6 +471,30 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* Bulk Selection Controls */
+.bulk-selection-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bulk-selection-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Preset Badge */
+.preset-badge {
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: inline-block;
 }
 
 /* Responsive */

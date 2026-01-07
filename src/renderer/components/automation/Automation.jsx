@@ -109,13 +109,64 @@ function Automation() {
         selectedPreset
       );
       if (result.success) {
+        // Keep selection to improve user workflow and enable consecutive operations
+        // This allows users to quickly reapply different presets to the same accounts
         await loadAccounts();
-        setSelectedAccounts([]);
-        alert(`Preset applied to ${selectedAccounts.length} account(s)`);
+        const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
+        alert(`Preset "${presetName}" applied to ${selectedAccounts.length} account(s)`);
       }
     } catch (error) {
       console.error('Failed to apply preset:', error);
       alert('Failed to apply preset');
+    }
+  };
+
+  const handleBulkApplyPresetAndStart = async () => {
+    if (selectedAccounts.length === 0) {
+      alert('Please select at least one account');
+      return;
+    }
+
+    try {
+      // Step 1: Apply preset to all selected accounts
+      const applyResult = await window.electronAPI.bulkApplyPreset(
+        selectedAccounts,
+        selectedPreset
+      );
+      
+      if (!applyResult.success) {
+        alert('Failed to apply preset');
+        return;
+      }
+
+      // Step 2: Start automation on all selected accounts
+      const startPromises = selectedAccounts.map(accountId => 
+        window.electronAPI.startAutomation(accountId)
+          .then(result => ({ accountId, success: result.success }))
+          .catch(error => ({ accountId, success: false, error: error.message }))
+      );
+      
+      const startResults = await Promise.all(startPromises);
+
+      // Count successes
+      const successCount = startResults.filter(r => r.success).length;
+      
+      // Reload accounts to show updated status
+      await loadAccounts();
+      
+      // Show success message
+      const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
+      alert(
+        `Preset "${presetName}" applied and ` +
+        `automation started on ${successCount} of ${selectedAccounts.length} account(s)`
+      );
+      
+      // Keep selection for easy re-use and consecutive operations
+      // This allows users to quickly reapply different presets without reselecting accounts
+      
+    } catch (error) {
+      console.error('Failed to apply preset and start:', error);
+      alert('Failed to apply preset and start automation');
     }
   };
 
@@ -233,18 +284,38 @@ function Automation() {
         <div className="bulk-actions">
           <button
             className="btn btn-primary"
-            onClick={handleBulkApplyPreset}
+            onClick={handleBulkApplyPresetAndStart}
             disabled={selectedAccounts.length === 0}
           >
             <actionIcons.bot size={18} style={{ marginRight: '8px' }} />
-            Apply "{presetDescriptions[selectedPreset].name}" to {selectedAccounts.length} Account{selectedAccounts.length !== 1 ? 's' : ''}
+            {selectedAccounts.length === 0 
+              ? `Select accounts to apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}"`
+              : `Apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
+            }
           </button>
         </div>
       </div>
 
       {/* Accounts List */}
       <div className="automation-accounts">
-        <h3 className="section-title">Account Automation Settings</h3>
+        {/* Bulk selection controls */}
+        <div className="bulk-selection-controls">
+          <h3 className="section-title-no-margin">Account Automation Settings</h3>
+          <div className="bulk-selection-buttons">
+            <button 
+              className="btn btn-sm btn-secondary"
+              onClick={() => setSelectedAccounts(accounts.map(a => a.id))}
+            >
+              Select All
+            </button>
+            <button 
+              className="btn btn-sm btn-secondary"
+              onClick={() => setSelectedAccounts([])}
+            >
+              Deselect All
+            </button>
+          </div>
+        </div>
         
         {accounts.length === 0 ? (
           <div className="empty-state">
@@ -265,6 +336,15 @@ function Automation() {
                   <div className="account-info">
                     <h4 className="account-name">{account.nickname || account.username}</h4>
                     {account.username && <p className="account-username">@{account.username}</p>}
+                    {/* Show current preset */}
+                    {account.preset && (
+                      <span 
+                        className="preset-badge" 
+                        style={{ backgroundColor: presetDescriptions[account.preset]?.color || '#666' }}
+                      >
+                        {presetDescriptions[account.preset]?.name || account.preset}
+                      </span>
+                    )}
                   </div>
                 </div>
 
