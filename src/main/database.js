@@ -204,6 +204,36 @@ class DatabaseManager {
     } catch (error) {
       console.error('Migration error:', error);
     }
+    
+    // Migration: Assign random devices to existing accounts with default 'iphone13'
+    try {
+      const defaultDeviceAccounts = this.db.prepare(`
+        SELECT id FROM accounts WHERE device_type = 'iphone13'
+      `).all();
+      
+      if (defaultDeviceAccounts.length > 0) {
+        console.log(`Running migration: Assigning random devices to ${defaultDeviceAccounts.length} accounts with default device`);
+        
+        const deviceKeys = [
+          'iphone13promax', 'iphone13', 'iphone12', 'iphone11', 
+          'iphone14', 'iphone14pro',
+          'galaxys21', 'galaxys22', 'pixel6', 'oneplus9'
+        ];
+        
+        const updateStmt = this.db.prepare(`
+          UPDATE accounts SET device_type = ? WHERE id = ?
+        `);
+        
+        defaultDeviceAccounts.forEach(account => {
+          const randomDevice = deviceKeys[Math.floor(Math.random() * deviceKeys.length)];
+          updateStmt.run(randomDevice, account.id);
+        });
+        
+        console.log('Migration completed: Random devices assigned to existing accounts');
+      }
+    } catch (error) {
+      console.error('Migration error (random device assignment):', error);
+    }
   }
 
   // Encryption helpers
@@ -224,9 +254,17 @@ class DatabaseManager {
 
   // Account methods
   addAccount({ username, email, password, nickname }) {
+    // Assign random device immediately during account creation
+    const deviceKeys = [
+      'iphone13promax', 'iphone13', 'iphone12', 'iphone11', 
+      'iphone14', 'iphone14pro',
+      'galaxys21', 'galaxys22', 'pixel6', 'oneplus9'
+    ];
+    const randomDeviceKey = deviceKeys[Math.floor(Math.random() * deviceKeys.length)];
+    
     const stmt = this.db.prepare(`
-      INSERT INTO accounts (username, email, password_encrypted, nickname)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO accounts (username, email, password_encrypted, nickname, device_type)
+      VALUES (?, ?, ?, ?, ?)
     `);
     
     // Password is optional - use empty string if not provided
@@ -236,7 +274,8 @@ class DatabaseManager {
       username,
       email || null,
       encryptedPassword,
-      nickname || null
+      nickname || null,
+      randomDeviceKey
     );
 
     // Create default automation settings
