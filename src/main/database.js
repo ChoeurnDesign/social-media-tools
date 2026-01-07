@@ -150,6 +150,32 @@ class DatabaseManager {
       )
     `);
 
+    // Content Queue table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS content_queue (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id INTEGER,
+        video_path TEXT,
+        caption TEXT,
+        hashtags TEXT,
+        scheduled_time DATETIME,
+        status TEXT DEFAULT 'pending',
+        thumbnail_path TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        posted_at DATETIME,
+        FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Settings table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Create indexes for performance
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_accounts_status ON accounts(status);
@@ -182,10 +208,13 @@ class DatabaseManager {
       VALUES (?, ?, ?, ?)
     `);
     
+    // Password is optional - use empty string if not provided
+    const encryptedPassword = password ? this.encrypt(password) : this.encrypt('');
+    
     const result = stmt.run(
       username,
       email || null,
-      this.encrypt(password),
+      encryptedPassword,
       nickname || null
     );
 
@@ -500,6 +529,97 @@ class DatabaseManager {
       totalViews,
       activePercentage: totalAccounts > 0 ? Math.round((activeAccounts / totalAccounts) * 100) : 0
     };
+  }
+
+  // Content Queue methods
+  addToContentQueue({ accountId, videoPath, caption, hashtags, scheduledTime, thumbnailPath }) {
+    const stmt = this.db.prepare(`
+      INSERT INTO content_queue (account_id, video_path, caption, hashtags, scheduled_time, thumbnail_path)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    
+    const result = stmt.run(
+      accountId,
+      videoPath,
+      caption || null,
+      hashtags || null,
+      scheduledTime || null,
+      thumbnailPath || null
+    );
+
+    return { id: result.lastInsertRowid, accountId, videoPath, caption, hashtags, scheduledTime, status: 'pending' };
+  }
+
+  getContentQueue(accountId = null) {
+    let stmt;
+    if (accountId) {
+      stmt = this.db.prepare(`
+        SELECT cq.*, a.username, a.nickname 
+        FROM content_queue cq
+        JOIN accounts a ON cq.account_id = a.id
+        WHERE cq.account_id = ?
+        ORDER BY cq.scheduled_time ASC, cq.created_at DESC
+      `);
+      return stmt.all(accountId);
+    } else {
+      stmt = this.db.prepare(`
+        SELECT cq.*, a.username, a.nickname 
+        FROM content_queue cq
+        JOIN accounts a ON cq.account_id = a.id
+        ORDER BY cq.scheduled_time ASC, cq.created_at DESC
+      `);
+      return stmt.all();
+    }
+  }
+
+  updateContentQueueStatus(id, status, postedAt = null) {
+    const updates = ['status = ?'];
+    const values = [status];
+
+    if (postedAt) {
+      updates.push('posted_at = ?');
+      values.push(postedAt);
+    }
+
+    values.push(id);
+
+    const stmt = this.db.prepare(`
+      UPDATE content_queue 
+      SET ${updates.join(', ')}
+      WHERE id = ?
+    `);
+    
+    stmt.run(...values);
+  }
+
+  deleteFromContentQueue(id) {
+    const stmt = this.db.prepare('DELETE FROM content_queue WHERE id = ?');
+    stmt.run(id);
+  }
+
+  // Settings methods
+  getSetting(key, defaultValue = null) {
+    const stmt = this.db.prepare('SELECT value FROM app_settings WHERE key = ?');
+    const result = stmt.get(key);
+    return result ? result.value : defaultValue;
+  }
+
+  setSetting(key, value) {
+    const stmt = this.db.prepare(`
+      INSERT OR REPLACE INTO app_settings (key, value, updated_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+    `);
+    stmt.run(key, value);
+  }
+
+  getAllSettings() {
+    const stmt = this.db.prepare('SELECT * FROM app_settings');
+    const rows = stmt.all();
+    const settings = {};
+    rows.forEach(row => {
+      settings[row.key] = row.value;
+    });
+    return settings;
   }
 
   close() {

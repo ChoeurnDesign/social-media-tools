@@ -152,6 +152,38 @@
   margin: 0;
 }
 
+/* Auth Info Box */
+.auth-info {
+  margin-top: 0.5rem;
+  padding: 1.25rem;
+  background: rgba(102, 126, 234, 0.1);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+}
+
+.auth-info-header {
+  display: flex;
+  align-items: center;
+  color: var(--accent-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.auth-info-text {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Field Help Text */
+.field-help {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin: 0.25rem 0 0 0;
+  font-style: italic;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .add-account-container {

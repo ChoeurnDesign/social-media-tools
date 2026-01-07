@@ -5,7 +5,6 @@ import '../styles/AddAccount.css';
 function AddAccount({ account, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     username: '',
-    password: '',
     nickname: '',
   });
 
@@ -15,7 +14,6 @@ function AddAccount({ account, onSave, onCancel }) {
     if (account) {
       setFormData({
         username: account.username || '',
-        password: '', // Don't pre-fill password for security
         nickname: account.nickname || '',
       });
     }
@@ -24,12 +22,8 @@ function AddAccount({ account, onSave, onCancel }) {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
-    }
-
-    if (!account && !formData.password.trim()) {
-      newErrors.password = 'Password is required for new accounts';
+    if (!formData.nickname.trim()) {
+      newErrors.nickname = 'Nickname/Label is required';
     }
 
     setErrors(newErrors);
@@ -44,14 +38,10 @@ function AddAccount({ account, onSave, onCancel }) {
     }
 
     const accountData = {
-      username: formData.username.trim(),
-      nickname: formData.nickname.trim() || formData.username.trim(),
+      username: formData.username.trim() || formData.nickname.trim(),
+      nickname: formData.nickname.trim(),
+      password: '', // Empty password - authentication happens via TikTok OAuth
     };
-
-    // Only include password if it's provided
-    if (formData.password.trim()) {
-      accountData.password = formData.password;
-    }
 
     if (account) {
       onSave(account.id, accountData);
@@ -94,46 +84,8 @@ function AddAccount({ account, onSave, onCancel }) {
 
         <form onSubmit={handleSubmit} className="account-form">
           <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              TikTok Username *
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className={`form-input ${errors.username ? 'error' : ''}`}
-              placeholder="Enter your TikTok username"
-              autoComplete="off"
-            />
-            {errors.username && (
-              <span className="error-message">{errors.username}</span>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password {account ? '(leave blank to keep current)' : '*'}
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`form-input ${errors.password ? 'error' : ''}`}
-              placeholder="Enter your password"
-              autoComplete="new-password"
-            />
-            {errors.password && (
-              <span className="error-message">{errors.password}</span>
-            )}
-          </div>
-
-          <div className="form-group">
             <label htmlFor="nickname" className="form-label">
-              Nickname / Display Name
+              Account Label / Nickname *
             </label>
             <input
               type="text"
@@ -141,9 +93,47 @@ function AddAccount({ account, onSave, onCancel }) {
               name="nickname"
               value={formData.nickname}
               onChange={handleChange}
-              className="form-input"
-              placeholder="Optional: A friendly name for this account"
+              className={`form-input ${errors.nickname ? 'error' : ''}`}
+              placeholder="e.g., My Personal Account, Business Account"
+              autoComplete="off"
             />
+            {errors.nickname && (
+              <span className="error-message">{errors.nickname}</span>
+            )}
+            <p className="field-help">
+              This is just a label to help you identify this account in the app.
+            </p>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="username" className="form-label">
+              TikTok Username (Optional)
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="e.g., @username (for display purposes only)"
+              autoComplete="off"
+            />
+            <p className="field-help">
+              Optional - for display purposes only. You can leave this blank.
+            </p>
+          </div>
+
+          <div className="auth-info">
+            <div className="auth-info-header">
+              <formIcons.lock size={20} style={{ marginRight: '8px' }} />
+              <strong>How Authentication Works</strong>
+            </div>
+            <p className="auth-info-text">
+              TikTok uses social login (Google, Facebook, Apple) for authentication, not username/password.
+              After adding this account, click the <strong>"Login"</strong> button to open a mobile instance
+              where you'll log in using TikTok's normal login flow. Your session will be saved automatically.
+            </p>
           </div>
 
           <div className="form-actions">
@@ -159,7 +149,7 @@ function AddAccount({ account, onSave, onCancel }) {
         <div className="security-info">
           <p>
             <formIcons.lock size={16} style={{ marginRight: '8px', display: 'inline', verticalAlign: 'middle' }} />
-            Your credentials are encrypted using AES-256 encryption before being stored locally.
+            All account data is encrypted and stored locally on your device. Your data never leaves your computer.
           </p>
         </div>
       </div>
