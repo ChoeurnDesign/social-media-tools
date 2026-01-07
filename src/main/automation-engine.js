@@ -59,6 +59,11 @@ const DEFAULT_COMMENT_TEMPLATES = [
 const INSTANCE_LOAD_DELAY = 2000; // Time to wait after page load for JS initialization
 const INSTANCE_LOAD_TIMEOUT = 10000; // Maximum time to wait for page load
 
+// Anti-detection staggered start delays (in milliseconds)
+const MIN_STAGGER_DELAY_MS = 30000;  // 30 seconds minimum between instance openings
+const MAX_STAGGER_DELAY_MS = 120000; // 120 seconds maximum between instance openings
+const AVERAGE_STAGGER_DELAY_S = 75;  // Average delay in seconds (for UI time estimates)
+
 class AutomationEngine {
   constructor(database, instanceManager) {
     this.db = database;
@@ -305,8 +310,9 @@ class AutomationEngine {
         
         // Add random delay before next account (except for last one)
         if (i < accountIds.length - 1) {
-          // Random delay between 30-120 seconds
-          const delay = 30000 + Math.floor(Math.random() * 90000);
+          // Random delay between MIN and MAX stagger delay
+          const delayRange = MAX_STAGGER_DELAY_MS - MIN_STAGGER_DELAY_MS;
+          const delay = MIN_STAGGER_DELAY_MS + Math.floor(Math.random() * delayRange);
           console.log(`Waiting ${Math.round(delay/1000)}s before opening next instance...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
