@@ -97,10 +97,23 @@ class AutomationEngine {
 
   async applyToInstance(accountId) {
     const settings = this.db.getAutomationSettings(accountId);
-    if (!settings) return;
+    if (!settings) {
+      console.warn(`No automation settings found for account ${accountId}`);
+      return;
+    }
 
     const instance = this.instanceManager.instances.get(accountId);
-    if (!instance || instance.isDestroyed()) return;
+    if (!instance || instance.isDestroyed()) {
+      console.warn(`No active instance found for account ${accountId}`);
+      return;
+    }
+
+    console.log(`Applying automation settings to account ${accountId}:`, {
+      autoScroll: settings.auto_scroll === 1,
+      scrollSpeed: settings.scroll_speed,
+      autoLike: settings.auto_like === 1,
+      preset: settings.preset
+    });
 
     // Send settings to instance
     instance.webContents.send('automation-command', {
@@ -120,6 +133,7 @@ class AutomationEngine {
 
     // Start auto-scroll if enabled
     if (settings.auto_scroll === 1) {
+      console.log(`Starting auto-scroll at speed ${settings.scroll_speed} for account ${accountId}`);
       instance.webContents.send('automation-command', {
         command: 'start-auto-scroll',
         speed: settings.scroll_speed
@@ -133,7 +147,40 @@ class AutomationEngine {
       throw new Error('No automation settings found for account');
     }
 
+    // Check if mobile instance exists
+    let instance = this.instanceManager.instances.get(accountId);
+    
+    // If not, create it!
+    if (!instance || instance.isDestroyed()) {
+      console.log(`No instance found for account ${accountId}, creating new instance...`);
+      
+      // Get account data
+      const account = this.db.getAccountById(accountId);
+      if (!account) {
+        throw new Error('Account not found');
+      }
+      
+      // Create mobile instance
+      instance = this.instanceManager.createMobileInstance(account);
+      
+      // Wait for TikTok to load before applying automation
+      await new Promise((resolve) => {
+        // Wait for page to finish loading
+        instance.webContents.once('did-finish-load', () => {
+          console.log(`Instance loaded for account ${accountId}`);
+          // Give it extra time for TikTok's JavaScript to initialize
+          setTimeout(resolve, 2000);
+        });
+        
+        // Fallback timeout in case did-finish-load doesn't fire
+        setTimeout(resolve, 10000);
+      });
+    }
+
+    // Now apply automation settings to the instance
     await this.applyToInstance(accountId);
+    
+    // Mark as active
     this.activeAutomations.set(accountId, { 
       active: true, 
       startedAt: new Date() 

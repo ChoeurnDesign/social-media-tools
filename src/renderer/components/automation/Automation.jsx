@@ -128,6 +128,9 @@ function Automation() {
     }
 
     try {
+      // Show loading state
+      console.log('Starting automation for accounts:', selectedAccounts);
+      
       // Step 1: Apply preset to all selected accounts
       const applyResult = await window.electronAPI.bulkApplyPreset(
         selectedAccounts,
@@ -139,11 +142,19 @@ function Automation() {
         return;
       }
 
-      // Step 2: Start automation on all selected accounts
+      console.log('Preset applied, now starting automation...');
+
+      // Step 2: Start automation on all selected accounts (this will now open instances!)
       const startPromises = selectedAccounts.map(accountId => 
         window.electronAPI.startAutomation(accountId)
-          .then(result => ({ accountId, success: result.success }))
-          .catch(error => ({ accountId, success: false, error: error.message }))
+          .then(result => {
+            console.log(`Automation started for account ${accountId}:`, result);
+            return { accountId, success: result.success };
+          })
+          .catch(error => {
+            console.error(`Failed to start automation for account ${accountId}:`, error);
+            return { accountId, success: false, error: error.message };
+          })
       );
       
       const startResults = await Promise.all(startPromises);
@@ -151,14 +162,17 @@ function Automation() {
       // Count successes
       const successCount = startResults.filter(r => r.success).length;
       
+      console.log(`Automation started on ${successCount} of ${selectedAccounts.length} accounts`);
+      
       // Reload accounts to show updated status
       await loadAccounts();
       
       // Show success message
       const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
       alert(
-        `Preset "${presetName}" applied and ` +
-        `automation started on ${successCount} of ${selectedAccounts.length} account(s)`
+        `✅ ${successCount} mobile instance(s) opened!\n` +
+        `Preset "${presetName}" applied and automation started.\n\n` +
+        `You should see TikTok windows opening now.`
       );
       
       // Keep selection for easy re-use and consecutive operations
@@ -166,7 +180,7 @@ function Automation() {
       
     } catch (error) {
       console.error('Failed to apply preset and start:', error);
-      alert('Failed to apply preset and start automation');
+      alert('❌ Failed to apply preset and start automation: ' + error.message);
     }
   };
 
