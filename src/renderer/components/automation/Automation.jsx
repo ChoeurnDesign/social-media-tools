@@ -5,6 +5,7 @@ import '../../styles/Automation.css';
 function Automation() {
   const [accounts, setAccounts] = useState([]);
   const [presets, setPresets] = useState({});
+  const [devicePresets, setDevicePresets] = useState({});
   const [selectedAccounts, setSelectedAccounts] = useState([]);
   const [selectedPreset, setSelectedPreset] = useState('organic');
   const [activeSettings, setActiveSettings] = useState(null);
@@ -25,6 +26,7 @@ function Automation() {
   useEffect(() => {
     loadAccounts();
     loadPresets();
+    loadDevicePresets();
   }, []);
 
   const loadAccounts = async () => {
@@ -46,6 +48,17 @@ function Automation() {
       }
     } catch (error) {
       console.error('Failed to load presets:', error);
+    }
+  };
+
+  const loadDevicePresets = async () => {
+    try {
+      const result = await window.electronAPI.getDevicePresets();
+      if (result.success) {
+        setDevicePresets(result.data);
+      }
+    } catch (error) {
+      console.error('Failed to load device presets:', error);
     }
   };
 
@@ -211,63 +224,6 @@ function Automation() {
     }));
   };
 
-  const presetDescriptions = {
-    organic: {
-      name: 'Organic',
-      icon: '🌿',
-      description: 'Natural, human-like behavior with moderate engagement',
-      color: '#4ade80',
-      autoScroll: { speed: 150 },
-      autoLike: { probability: 0.2 },
-      autoFollow: { enabled: true, dailyLimit: 50 },
-      autoComment: { enabled: true, probability: 0.1 }
-    },
-    aggressive: {
-      name: 'Aggressive',
-      icon: '🔥',
-      description: 'Maximum engagement for rapid growth (higher risk)',
-      color: '#ef4444',
-      autoScroll: { speed: 50 },
-      autoLike: { probability: 0.5 },
-      autoFollow: { enabled: true, dailyLimit: 200 },
-      autoComment: { enabled: true, probability: 0.3 }
-    },
-    engagement: {
-      name: 'Engagement',
-      icon: '💬',
-      description: 'Focus on likes and comments for better interaction',
-      color: '#60a5fa',
-      autoScroll: { speed: 100 },
-      autoLike: { probability: 0.4 },
-      autoFollow: { enabled: false, dailyLimit: 0 },
-      autoComment: { enabled: true, probability: 0.4 }
-    },
-    conservative: {
-      name: 'Conservative',
-      icon: '🛡️',
-      description: 'Minimal automation, safest approach',
-      color: '#94a3b8',
-      autoScroll: { speed: 200 },
-      autoLike: { probability: 0.1 },
-      autoFollow: { enabled: false, dailyLimit: 0 },
-      autoComment: { enabled: false, probability: 0 }
-    },
-  };
-
-  // Device presets for displaying device info
-  const DEVICE_PRESETS = {
-    iphone13promax: { name: 'iPhone 13 Pro Max', width: 428, height: 926 },
-    iphone13: { name: 'iPhone 13', width: 390, height: 844 },
-    iphone12: { name: 'iPhone 12', width: 390, height: 844 },
-    iphone11: { name: 'iPhone 11', width: 414, height: 896 },
-    galaxys21: { name: 'Samsung Galaxy S21', width: 360, height: 800 },
-    pixel6: { name: 'Google Pixel 6', width: 412, height: 915 },
-    oneplus9: { name: 'OnePlus 9', width: 412, height: 919 },
-    iphone14: { name: 'iPhone 14', width: 390, height: 844 },
-    iphone14pro: { name: 'iPhone 14 Pro', width: 393, height: 852 },
-    galaxys22: { name: 'Samsung Galaxy S22', width: 360, height: 780 }
-  };
-
   return (
     <div className="automation-page">
       <div className="page-header">
@@ -284,7 +240,7 @@ function Automation() {
       <div className="presets-section">
         <h3 className="section-title">Automation Presets</h3>
         <div className="presets-grid">
-          {Object.entries(presetDescriptions).map(([key, preset]) => (
+          {Object.entries(presets).map(([key, preset]) => (
             <div
               key={key}
               className={`preset-card ${selectedPreset === key ? 'active' : ''}`}
@@ -341,8 +297,8 @@ function Automation() {
           >
             <actionIcons.bot size={18} style={{ marginRight: '8px' }} />
             {selectedAccounts.length === 0 
-              ? `Select accounts to apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}"`
-              : `Apply "${presetDescriptions[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
+              ? `Select accounts to apply "${presets[selectedPreset]?.name || selectedPreset}"`
+              : `Apply "${presets[selectedPreset]?.name || selectedPreset}" & Start (${selectedAccounts.length})`
             }
           </button>
         </div>
@@ -390,14 +346,14 @@ function Automation() {
                     {account.username && <p className="account-username">@{account.username}</p>}
                     
                     {/* Device Info */}
-                    {account.device_type && DEVICE_PRESETS[account.device_type] && (
+                    {account.device_type && devicePresets[account.device_type] && (
                       <div className="account-device">
                         <span className="device-icon">📱</span>
                         <span className="device-name">
-                          {DEVICE_PRESETS[account.device_type].name}
+                          {devicePresets[account.device_type].name}
                         </span>
                         <span className="device-size">
-                          ({DEVICE_PRESETS[account.device_type].width}×{DEVICE_PRESETS[account.device_type].height})
+                          ({devicePresets[account.device_type].width}×{devicePresets[account.device_type].height})
                         </span>
                       </div>
                     )}
@@ -414,9 +370,9 @@ function Automation() {
                     {account.preset && (
                       <span 
                         className="preset-badge" 
-                        style={{ backgroundColor: presetDescriptions[account.preset]?.color || '#666' }}
+                        style={{ backgroundColor: presets[account.preset]?.color || '#666' }}
                       >
-                        {presetDescriptions[account.preset]?.icon} {presetDescriptions[account.preset]?.name || account.preset}
+                        {presets[account.preset]?.icon} {presets[account.preset]?.name || account.preset}
                       </span>
                     )}
                   </div>
