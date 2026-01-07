@@ -40,11 +40,14 @@
   "dependencies": {
     "better-sqlite3": "^12.5.0",
     "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
     "electron-store": "^11.0.2",
     "lucide-react": "^0.562.0",
     "puppeteer-core": "^24.34.0",
     "react": "^19.2.3",
+    "react-color": "^2.19.3",
     "react-dom": "^19.2.3",
+    "react-toastify": "^11.0.5",
     "recharts": "^3.6.0"
   },
   "build": {

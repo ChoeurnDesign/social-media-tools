@@ -182,10 +182,13 @@ class DatabaseManager {
       VALUES (?, ?, ?, ?)
     `);
     
+    // Password is optional - use empty string if not provided
+    const encryptedPassword = password ? this.encrypt(password) : this.encrypt('');
+    
     const result = stmt.run(
       username,
       email || null,
-      this.encrypt(password),
+      encryptedPassword,
       nickname || null
     );
 
