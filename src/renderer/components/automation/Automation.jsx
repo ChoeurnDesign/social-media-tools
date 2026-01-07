@@ -128,41 +128,37 @@ function Automation() {
     }
 
     try {
-      // Show loading state
-      console.log('Starting automation for accounts:', selectedAccounts);
+      // Show warning for multiple accounts
+      if (selectedAccounts.length > 1) {
+        // Calculate estimated time: (accounts - 1) * average delay / 60 seconds per minute
+        const estimatedMinutes = Math.ceil((selectedAccounts.length - 1) * 75 / 60);
+        
+        const confirm = window.confirm(
+          `⚠️ ANTI-DETECTION MODE\n\n` +
+          `Opening ${selectedAccounts.length} accounts with random delays (30-120 seconds between each).\n\n` +
+          `This process will take approximately ${estimatedMinutes} minutes to complete.\n\n` +
+          `Each account will use a different device type and behavior pattern to avoid TikTok bot detection.\n\n` +
+          `Continue?`
+        );
+        
+        if (!confirm) return;
+      }
       
-      // Step 1: Apply preset to all selected accounts
-      const applyResult = await window.electronAPI.bulkApplyPreset(
+      console.log('Starting staggered automation for accounts:', selectedAccounts);
+      
+      // ✅ Use staggered start with anti-detection
+      const result = await window.electronAPI.bulkApplyPresetStaggered(
         selectedAccounts,
         selectedPreset
       );
       
-      if (!applyResult.success) {
+      if (!result.success) {
         alert('Failed to apply preset');
         return;
       }
 
-      console.log('Preset applied, now starting automation...');
-
-      // Step 2: Start automation on all selected accounts (this will now open instances!)
-      const startPromises = selectedAccounts.map(accountId => 
-        window.electronAPI.startAutomation(accountId)
-          .then(result => {
-            console.log(`Automation started for account ${accountId}:`, result);
-            return { accountId, success: result.success };
-          })
-          .catch(error => {
-            console.error(`Failed to start automation for account ${accountId}:`, error);
-            return { accountId, success: false, error: error.message };
-          })
-      );
-      
-      const startResults = await Promise.all(startPromises);
-
-      // Count successes
+      const { startResults } = result.data;
       const successCount = startResults.filter(r => r.success).length;
-      
-      console.log(`Automation started on ${successCount} of ${selectedAccounts.length} accounts`);
       
       // Reload accounts to show updated status
       await loadAccounts();
@@ -170,13 +166,15 @@ function Automation() {
       // Show success message
       const presetName = presetDescriptions[selectedPreset]?.name || selectedPreset;
       alert(
-        `✅ ${successCount} mobile instance(s) opened!\n` +
-        `Preset "${presetName}" applied and automation started.\n\n` +
-        `You should see TikTok windows opening now.`
+        `✅ Anti-Detection Mode Active!\n\n` +
+        `${successCount} of ${selectedAccounts.length} accounts started.\n\n` +
+        `Each account is using:\n` +
+        `• Random device type\n` +
+        `• Unique user agent\n` +
+        `• Randomized behavior\n` +
+        `• Staggered opening times\n\n` +
+        `Preset "${presetName}" applied successfully.`
       );
-      
-      // Keep selection for easy re-use and consecutive operations
-      // This allows users to quickly reapply different presets without reselecting accounts
       
     } catch (error) {
       console.error('Failed to apply preset and start:', error);

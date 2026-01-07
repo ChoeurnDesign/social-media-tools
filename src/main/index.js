@@ -303,6 +303,21 @@ function setupIpcHandlers() {
     }
   });
 
+  // Bulk apply preset with staggered start (anti-detection)
+  ipcMain.handle('bulk-apply-preset-staggered', async (event, accountIds, presetName) => {
+    try {
+      // First apply preset to all accounts
+      const applyResults = await automationEngine.bulkApplyPreset(accountIds, presetName);
+      
+      // Then start automation with delays
+      const startResults = await automationEngine.bulkStartAutomationStaggered(accountIds);
+      
+      return { success: true, data: { applyResults, startResults } };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
   // Auto scroll all
   ipcMain.handle('auto-scroll-all', async (event, speed) => {
     try {

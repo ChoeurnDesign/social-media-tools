@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateAutomationSettings: (accountId, settings) => ipcRenderer.invoke('update-automation-settings', accountId, settings),
   getAutomationSettings: (accountId) => ipcRenderer.invoke('get-automation-settings', accountId),
   bulkApplyPreset: (accountIds, presetName) => ipcRenderer.invoke('bulk-apply-preset', accountIds, presetName),
+  bulkApplyPresetStaggered: (accountIds, presetName) => ipcRenderer.invoke('bulk-apply-preset-staggered', accountIds, presetName),
   autoScrollAll: (speed) => ipcRenderer.invoke('auto-scroll-all', speed),
   stopAutoScrollAll: () => ipcRenderer.invoke('stop-auto-scroll-all'),
   

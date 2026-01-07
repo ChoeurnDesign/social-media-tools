@@ -6,13 +6,88 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Device presets
+// Device presets with comprehensive anti-detection properties
 const DEVICE_PRESETS = {
-  'iphone13': { width: 390, height: 844, name: 'iPhone 13' },
-  'iphone8': { width: 375, height: 667, name: 'iPhone 8' },
-  'pixel6': { width: 412, height: 915, name: 'Google Pixel 6' },
-  'galaxy-s21': { width: 360, height: 800, name: 'Galaxy S21' },
-  'custom': { width: 360, height: 780, name: 'Custom' }
+  iphone13promax: {
+    name: 'iPhone 13 Pro Max',
+    width: 428,
+    height: 926,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Mobile/15E148 Safari/604.1',
+    platform: 'iPhone',
+    devicePixelRatio: 3
+  },
+  iphone13: {
+    name: 'iPhone 13',
+    width: 390,
+    height: 844,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
+    platform: 'iPhone',
+    devicePixelRatio: 3
+  },
+  iphone12: {
+    name: 'iPhone 12',
+    width: 390,
+    height: 844,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.7 Mobile/15E148 Safari/604.1',
+    platform: 'iPhone',
+    devicePixelRatio: 3
+  },
+  iphone11: {
+    name: 'iPhone 11',
+    width: 414,
+    height: 896,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Mobile/15E148 Safari/604.1',
+    platform: 'iPhone',
+    devicePixelRatio: 2
+  },
+  galaxys21: {
+    name: 'Samsung Galaxy S21',
+    width: 360,
+    height: 800,
+    userAgent: 'Mozilla/5.0 (Linux; Android 13; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36',
+    platform: 'Linux armv8l',
+    devicePixelRatio: 3
+  },
+  pixel6: {
+    name: 'Google Pixel 6',
+    width: 412,
+    height: 915,
+    userAgent: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36',
+    platform: 'Linux armv8l',
+    devicePixelRatio: 2.625
+  },
+  oneplus9: {
+    name: 'OnePlus 9',
+    width: 412,
+    height: 919,
+    userAgent: 'Mozilla/5.0 (Linux; Android 12; LE2113) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36',
+    platform: 'Linux armv8l',
+    devicePixelRatio: 3.5
+  },
+  iphone14: {
+    name: 'iPhone 14',
+    width: 390,
+    height: 844,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    platform: 'iPhone',
+    devicePixelRatio: 3
+  },
+  iphone14pro: {
+    name: 'iPhone 14 Pro',
+    width: 393,
+    height: 852,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1',
+    platform: 'iPhone',
+    devicePixelRatio: 3
+  },
+  galaxys22: {
+    name: 'Samsung Galaxy S22',
+    width: 360,
+    height: 780,
+    userAgent: 'Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Mobile Safari/537.36',
+    platform: 'Linux armv8l',
+    devicePixelRatio: 3
+  }
 };
 
 class InstanceManager {
@@ -45,10 +120,20 @@ class InstanceManager {
       throw new Error(`Maximum ${this.settings.maxInstances} instances allowed`);
     }
 
-    // Get device dimensions
-    const preset = DEVICE_PRESETS[this.settings.devicePreset] || DEVICE_PRESETS.iphone13;
-    const width = options.width || preset.width;
-    const height = options.height || preset.height;
+    // ✅ Get device for this account (random if not assigned)
+    let deviceType = this.db.getAccountDevice(account.id);
+    if (!deviceType || !DEVICE_PRESETS[deviceType]) {
+      deviceType = this.db.assignRandomDeviceToAccount(account.id);
+    }
+    
+    const devicePreset = DEVICE_PRESETS[deviceType];
+    
+    // ✅ Add random variation to dimensions (±5px to avoid exact fingerprinting)
+    const widthVariation = Math.floor(Math.random() * 11) - 5;  // -5 to +5
+    const heightVariation = Math.floor(Math.random() * 11) - 5;
+    
+    const width = options.width || (devicePreset.width + widthVariation);
+    const height = options.height || (devicePreset.height + heightVariation);
 
     // Calculate position
     const { x, y } = this.calculatePosition(width, height);
@@ -71,9 +156,8 @@ class InstanceManager {
       show: false
     });
 
-    // Set mobile user agent
-    const userAgent = this.getMobileUserAgent();
-    mobileWindow.webContents.setUserAgent(userAgent);
+    // ✅ Set device-specific user agent
+    mobileWindow.webContents.setUserAgent(devicePreset.userAgent);
 
     // Load TikTok
     mobileWindow.loadURL('https://www.tiktok.com');
@@ -81,16 +165,15 @@ class InstanceManager {
     // Show when ready
     mobileWindow.once('ready-to-show', () => {
       mobileWindow.show();
+      
+      // ✅ Inject device fingerprint spoofing
+      this.injectDeviceFingerprint(mobileWindow, devicePreset);
     });
 
     // Handle window close
     mobileWindow.on('closed', () => {
       this.instances.delete(account.id);
-      
-      // Update account status
       this.db.updateAccount(account.id, { status: 'inactive' });
-      
-      // Log activity
       this.db.logActivity(account.id, 'instance_closed');
     });
 
@@ -101,8 +184,8 @@ class InstanceManager {
     this.db.updateAccount(account.id, { status: 'active' });
     this.db.updateLastLogin(account.id);
 
-    // Log activity
-    this.db.logActivity(account.id, 'instance_opened');
+    // Log activity with device info
+    this.db.logActivity(account.id, 'instance_opened', { device: devicePreset.name });
 
     return mobileWindow;
   }
@@ -125,10 +208,40 @@ class InstanceManager {
     return { x, y };
   }
 
-  getMobileUserAgent() {
-    return 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) ' +
-           'AppleWebKit/605.1.15 (KHTML, like Gecko) ' +
-           'Version/15.0 Mobile/15E148 Safari/604.1';
+  injectDeviceFingerprint(window, devicePreset) {
+    // Calculate random values outside template to ensure consistency
+    const hardwareConcurrency = 4 + Math.floor(Math.random() * 5);  // 4-8 cores
+    const deviceMemory = [4, 6, 8, 12, 16][Math.floor(Math.random() * 5)];  // Random GB
+    
+    // Inject JavaScript to override device fingerprinting
+    window.webContents.executeJavaScript(`
+      // Override navigator properties
+      Object.defineProperty(navigator, 'platform', {
+        get: () => '${devicePreset.platform}'
+      });
+      
+      Object.defineProperty(window, 'devicePixelRatio', {
+        get: () => ${devicePreset.devicePixelRatio}
+      });
+      
+      // Randomize some browser features slightly
+      Object.defineProperty(navigator, 'hardwareConcurrency', {
+        get: () => ${hardwareConcurrency}  // 4-8 cores
+      });
+      
+      // Random device memory (4-16 GB)
+      Object.defineProperty(navigator, 'deviceMemory', {
+        get: () => ${deviceMemory}
+      });
+      
+      console.log('🎭 Device fingerprint spoofing active:', {
+        platform: '${devicePreset.platform}',
+        devicePixelRatio: ${devicePreset.devicePixelRatio},
+        hardwareConcurrency: ${hardwareConcurrency},
+        deviceMemory: ${deviceMemory},
+        userAgent: navigator.userAgent
+      });
+    `);
   }
 
   closeInstance(accountId) {

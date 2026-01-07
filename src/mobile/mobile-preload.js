@@ -18,17 +18,18 @@ let automationSettings = {
 let followCountToday = 0;
 let lastFollowDate = new Date().toDateString();
 
-// Auto scroll functionality
+// Auto scroll functionality with randomization
 function startAutoScroll(speed = 100) {
   if (autoScrollInterval) {
     clearInterval(autoScrollInterval);
   }
 
-  console.log(`🔄 Auto-scroll started at speed ${speed}ms`);
+  console.log(`🔄 Auto-scroll started at base speed ${speed}ms`);
 
   autoScrollInterval = setInterval(() => {
-    // Random scroll amount (human-like)
-    const scrollAmount = 50 + Math.random() * 50;
+    // ✅ Random scroll amount with variation (more human-like)
+    const baseScroll = 50 + Math.random() * 50;
+    const scrollAmount = baseScroll * (0.7 + Math.random() * 0.6);  // ±30% variation
     
     console.log(`📜 Scrolling ${Math.round(scrollAmount)}px`);
     
@@ -45,21 +46,21 @@ function startAutoScroll(speed = 100) {
       }, 1000 + Math.random() * 2000);
     }
 
-    // Trigger auto-like if enabled
-    if (automationSettings.autoLike) {
-      tryAutoLike();
+    // ✅ Random actions with varying probabilities
+    if (automationSettings.autoLike && Math.random() < automationSettings.likeProbability) {
+      // Add random delay before liking (1-5 seconds)
+      setTimeout(() => tryAutoLike(), 1000 + Math.random() * 4000);
     }
 
-    // Trigger auto-follow if enabled
-    if (automationSettings.autoFollow) {
-      tryAutoFollow();
+    if (automationSettings.autoFollow && Math.random() < 0.05) {  // Lower probability for follows
+      setTimeout(() => tryAutoFollow(), 2000 + Math.random() * 6000);
     }
 
-    // Trigger auto-comment if enabled
-    if (automationSettings.autoComment) {
-      tryAutoComment();
+    if (automationSettings.autoComment && Math.random() < automationSettings.commentProbability) {
+      setTimeout(() => tryAutoComment(), 3000 + Math.random() * 7000);
     }
-  }, speed + Math.random() * 50);
+    
+  }, speed + Math.random() * (speed * 0.5));  // ✅ Variable interval (±50%)
 }
 
 function stopAutoScroll() {
@@ -86,7 +87,7 @@ function tryAutoLike() {
     // Random delay before clicking (human-like)
     setTimeout(() => {
       likeButton.click();
-      console.log('Auto-liked video');
+      console.log('❤️ Auto-liked video');
     }, 1000 + Math.random() * 3000);
     return true;
   }
