@@ -209,6 +209,10 @@ class InstanceManager {
   }
 
   injectDeviceFingerprint(window, devicePreset) {
+    // Calculate random values outside template to ensure consistency
+    const hardwareConcurrency = 4 + Math.floor(Math.random() * 5);  // 4-8 cores
+    const deviceMemory = [4, 6, 8, 12, 16][Math.floor(Math.random() * 5)];  // Random GB
+    
     // Inject JavaScript to override device fingerprinting
     window.webContents.executeJavaScript(`
       // Override navigator properties
@@ -222,17 +226,19 @@ class InstanceManager {
       
       // Randomize some browser features slightly
       Object.defineProperty(navigator, 'hardwareConcurrency', {
-        get: () => ${4 + Math.floor(Math.random() * 5)}  // 4-8 cores
+        get: () => ${hardwareConcurrency}  // 4-8 cores
       });
       
       // Random device memory (4-16 GB)
       Object.defineProperty(navigator, 'deviceMemory', {
-        get: () => ${[4, 6, 8, 12, 16][Math.floor(Math.random() * 5)]}
+        get: () => ${deviceMemory}
       });
       
       console.log('🎭 Device fingerprint spoofing active:', {
         platform: '${devicePreset.platform}',
         devicePixelRatio: ${devicePreset.devicePixelRatio},
+        hardwareConcurrency: ${hardwareConcurrency},
+        deviceMemory: ${deviceMemory},
         userAgent: navigator.userAgent
       });
     `);

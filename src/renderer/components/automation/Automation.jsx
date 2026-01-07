@@ -133,7 +133,7 @@ function Automation() {
         const confirm = window.confirm(
           `⚠️ ANTI-DETECTION MODE\n\n` +
           `Opening ${selectedAccounts.length} accounts with random delays (30-120 seconds between each).\n\n` +
-          `This process will take approximately ${Math.ceil(selectedAccounts.length * 60 / 60)} minutes to complete.\n\n` +
+          `This process will take approximately ${Math.ceil((selectedAccounts.length - 1) * 75 / 60)} minutes to complete.\n\n` +
           `Each account will use a different device type and behavior pattern to avoid TikTok bot detection.\n\n` +
           `Continue?`
         );
