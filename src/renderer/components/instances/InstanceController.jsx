@@ -51,10 +51,44 @@ function InstanceController() {
 
   const handleStartMultiple = async (count) => {
     setIsStarting(true);
-    const toastId = toast.loading(`Starting ${count} instances...`);
+    let toastId = null;
     
     try {
-      const result = await window.electronAPI.startMultipleInstances(count);
+      // ✅ PRE-CHECK: Get accounts first
+      const accountsResult = await window.electronAPI.getAccounts();
+      if (!accountsResult.success) {
+        toast.error('Failed to load accounts');
+        setIsStarting(false);
+        return;
+      }
+      
+      const allAccounts = accountsResult.data;
+      const inactiveAccounts = allAccounts.filter(a => a.status !== 'active');
+      
+      // ✅ CHECK: Do we have any accounts?
+      if (allAccounts.length === 0) {
+        toast.warning('No accounts found. Please add accounts first.');
+        setIsStarting(false);
+        return;
+      }
+      
+      // ✅ CHECK: Do we have any inactive accounts?
+      if (inactiveAccounts.length === 0) {
+        toast.warning('All accounts are already active. Close some instances first.');
+        setIsStarting(false);
+        return;
+      }
+      
+      // ✅ CHECK: Do we have enough inactive accounts?
+      const actualCount = Math.min(count, inactiveAccounts.length);
+      if (actualCount < count) {
+        toast.info(`Only ${actualCount} inactive account${actualCount !== 1 ? 's' : ''} available. Starting all...`);
+      }
+      
+      toastId = toast.loading(`Starting ${actualCount} instance${actualCount !== 1 ? 's' : ''}...`);
+      
+      // Use actualCount to match the number of available inactive accounts
+      const result = await window.electronAPI.startMultipleInstances(actualCount);
       
       if (result.success && result.data) {
         // Parse individual results
@@ -65,36 +99,45 @@ function InstanceController() {
         await loadInstances();
         
         // Show appropriate message based on results
-        if (failureCount === 0) {
+        if (failureCount === 0 && successCount > 0) {
           // All instances started successfully
           toast.update(toastId, {
-            render: `Successfully started ${successCount} instance${successCount !== 1 ? 's' : ''}!`,
+            render: `✅ Successfully started ${successCount} instance${successCount !== 1 ? 's' : ''}!`,
             type: 'success',
             isLoading: false,
             autoClose: 4000,
           });
-        } else if (successCount === 0) {
+        } else if (successCount === 0 && failureCount > 0) {
           // All instances failed
           const firstError = result.data.find(r => !r.success)?.error || 'Unknown error';
           toast.update(toastId, {
-            render: `Failed to start instances: ${firstError}`,
+            render: `❌ Failed to start instances: ${firstError}`,
             type: 'error',
             isLoading: false,
             autoClose: 6000,
           });
-        } else {
+        } else if (successCount > 0 && failureCount > 0) {
           // Partial success
           const firstError = result.data.find(r => !r.success)?.error || 'Unknown error';
           toast.update(toastId, {
-            render: `Started ${successCount} instance${successCount !== 1 ? 's' : ''} successfully. Failed to start ${failureCount}: ${firstError}`,
+            render: `⚠️ Started ${successCount} instance${successCount !== 1 ? 's' : ''}. Failed to start ${failureCount}: ${firstError}`,
             type: 'warning',
             isLoading: false,
             autoClose: 6000,
           });
+        } else {
+          // Empty results array - log for debugging
+          console.warn('Received empty results array from startMultipleInstances');
+          toast.update(toastId, {
+            render: '⚠️ No instances were started. Please try again.',
+            type: 'warning',
+            isLoading: false,
+            autoClose: 5000,
+          });
         }
       } else {
         toast.update(toastId, {
-          render: `Failed to start instances: ${result.error || 'Unknown error'}`,
+          render: `❌ Failed to start instances: ${result.error || 'Unknown error'}`,
           type: 'error',
           isLoading: false,
           autoClose: 6000,
@@ -102,12 +145,11 @@ function InstanceController() {
       }
     } catch (error) {
       console.error('Error starting instances:', error);
-      toast.update(toastId, {
-        render: `Failed to start instances: ${error.message}`,
-        type: 'error',
-        isLoading: false,
-        autoClose: 6000,
-      });
+      // Dismiss loading toast if it exists
+      if (toastId) {
+        toast.dismiss(toastId);
+      }
+      toast.error(`Failed to start instances: ${error.message}`);
     } finally {
       setIsStarting(false);
     }

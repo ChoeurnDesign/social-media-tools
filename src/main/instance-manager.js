@@ -322,10 +322,22 @@ class InstanceManager {
 
     for (const account of accountsToStart) {
       try {
-        const window = this.createMobileInstance(account);
-        results.push({ success: true, accountId: account.id, window });
+        // Create the instance
+        this.createMobileInstance(account);
+        
+        // ✅ FIX: Don't include 'window' object - it can't be serialized over IPC
+        results.push({ 
+          success: true, 
+          accountId: account.id,
+          username: account.username || account.nickname
+        });
       } catch (error) {
-        results.push({ success: false, accountId: account.id, error: error.message });
+        results.push({ 
+          success: false, 
+          accountId: account.id,
+          username: account.username || account.nickname,
+          error: error.message 
+        });
       }
     }
 
