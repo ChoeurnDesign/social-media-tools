@@ -77,26 +77,30 @@ class AutomationEngine {
   async applyPreset(accountId, presetName) {
     const preset = this.getPreset(presetName);
     
-    // Convert preset to database format
-    const settings = {
+    // ✅ Add randomization to preset values
+    const randomizedSettings = {
       auto_scroll: preset.autoScroll.enabled ? 1 : 0,
-      scroll_speed: preset.autoScroll.speed,
+      // ✅ Random scroll speed (±30% variation)
+      scroll_speed: Math.floor(preset.autoScroll.speed * (0.7 + Math.random() * 0.6)),
       auto_like: preset.autoLike.enabled ? 1 : 0,
-      like_probability: preset.autoLike.probability,
+      // ✅ Random like probability (±0.1 variation)
+      like_probability: Math.max(0.1, Math.min(0.9, preset.autoLike.probability + (Math.random() * 0.2 - 0.1))),
       auto_follow: preset.autoFollow?.enabled ? 1 : 0,
-      follow_daily_limit: preset.autoFollow?.dailyLimit || 100,
+      // ✅ Random daily limit (±20% variation)
+      follow_daily_limit: Math.floor((preset.autoFollow?.dailyLimit || 100) * (0.8 + Math.random() * 0.4)),
       auto_comment: preset.autoComment?.enabled ? 1 : 0,
-      comment_probability: preset.autoComment?.probability || 0.2,
+      // ✅ Random comment probability
+      comment_probability: Math.max(0.05, Math.min(0.5, (preset.autoComment?.probability || 0.2) + (Math.random() * 0.1 - 0.05))),
       preset: presetName
     };
 
     // Update database
-    this.db.updateAutomationSettings(accountId, settings);
+    this.db.updateAutomationSettings(accountId, randomizedSettings);
 
     // Apply to active instance if exists
     await this.applyToInstance(accountId);
 
-    return { success: true, preset: presetName };
+    return { success: true, preset: presetName, settings: randomizedSettings };
   }
 
   async applyToInstance(accountId) {
@@ -283,6 +287,36 @@ class AutomationEngine {
       }
     }
 
+    return results;
+  }
+
+  async bulkStartAutomationStaggered(accountIds) {
+    const results = [];
+    
+    for (let i = 0; i < accountIds.length; i++) {
+      const accountId = accountIds[i];
+      
+      try {
+        console.log(`Starting automation for account ${i + 1}/${accountIds.length}: ${accountId}`);
+        
+        // Start automation (this opens instance)
+        await this.startAutomation(accountId);
+        results.push({ accountId, success: true });
+        
+        // Add random delay before next account (except for last one)
+        if (i < accountIds.length - 1) {
+          // Random delay between 30-120 seconds
+          const delay = 30000 + Math.floor(Math.random() * 90000);
+          console.log(`Waiting ${Math.round(delay/1000)}s before opening next instance...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        
+      } catch (error) {
+        console.error(`Failed to start automation for ${accountId}:`, error);
+        results.push({ accountId, success: false, error: error.message });
+      }
+    }
+    
     return results;
   }
 

@@ -15,6 +15,7 @@ class DatabaseManager {
     this.db.pragma('foreign_keys = ON');
     
     this.initializeTables();
+    this.runMigrations();
   }
 
   initializeTables() {
@@ -34,7 +35,8 @@ class DatabaseManager {
         total_views INTEGER DEFAULT 0,
         last_login DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        device_type TEXT DEFAULT 'iphone13'
       )
     `);
 
@@ -183,6 +185,25 @@ class DatabaseManager {
       CREATE INDEX IF NOT EXISTS idx_activity_logs_account ON activity_logs(account_id);
       CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON activity_logs(created_at);
     `);
+  }
+
+  runMigrations() {
+    // Migration: Add device_type column to accounts table if it doesn't exist
+    try {
+      const tableInfo = this.db.prepare("PRAGMA table_info(accounts)").all();
+      const hasDeviceType = tableInfo.some(col => col.name === 'device_type');
+      
+      if (!hasDeviceType) {
+        console.log('Running migration: Adding device_type column to accounts table');
+        this.db.prepare(`
+          ALTER TABLE accounts 
+          ADD COLUMN device_type TEXT DEFAULT 'iphone13'
+        `).run();
+        console.log('Migration completed: device_type column added');
+      }
+    } catch (error) {
+      console.error('Migration error:', error);
+    }
   }
 
   // Encryption helpers
@@ -620,6 +641,30 @@ class DatabaseManager {
       settings[row.key] = row.value;
     });
     return settings;
+  }
+
+  // Device management methods
+  assignRandomDeviceToAccount(accountId) {
+    const deviceKeys = [
+      'iphone13promax', 'iphone13', 'iphone12', 'iphone11', 
+      'iphone14', 'iphone14pro',
+      'galaxys21', 'galaxys22', 'pixel6', 'oneplus9'
+    ];
+    const randomDeviceKey = deviceKeys[Math.floor(Math.random() * deviceKeys.length)];
+    
+    const stmt = this.db.prepare(`
+      UPDATE accounts 
+      SET device_type = ? 
+      WHERE id = ?
+    `);
+    stmt.run(randomDeviceKey, accountId);
+    
+    return randomDeviceKey;
+  }
+
+  getAccountDevice(accountId) {
+    const account = this.getAccountById(accountId);
+    return account?.device_type || 'iphone13';  // Default fallback
   }
 
   close() {
