@@ -466,6 +466,30 @@
   }
 }
 
+/* Bulk Selection Controls */
+.bulk-selection-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bulk-selection-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Preset Badge */
+.preset-badge {
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: inline-block;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .presets-grid {

@@ -139,15 +139,13 @@ function Automation() {
       }
 
       // Step 2: Start automation on all selected accounts
-      const startResults = [];
-      for (const accountId of selectedAccounts) {
-        try {
-          const result = await window.electronAPI.startAutomation(accountId);
-          startResults.push({ accountId, success: result.success });
-        } catch (error) {
-          startResults.push({ accountId, success: false, error: error.message });
-        }
-      }
+      const startPromises = selectedAccounts.map(accountId => 
+        window.electronAPI.startAutomation(accountId)
+          .then(result => ({ accountId, success: result.success }))
+          .catch(error => ({ accountId, success: false, error: error.message }))
+      );
+      
+      const startResults = await Promise.all(startPromises);
 
       // Count successes
       const successCount = startResults.filter(r => r.success).length;
@@ -299,15 +297,9 @@ function Automation() {
       {/* Accounts List */}
       <div className="automation-accounts">
         {/* Bulk selection controls */}
-        <div className="bulk-selection-controls" style={{
-          display: 'flex',
-          gap: '1rem',
-          marginBottom: '1rem',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div className="bulk-selection-controls">
           <h3 className="section-title" style={{ margin: 0 }}>Account Automation Settings</h3>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className="bulk-selection-buttons">
             <button 
               className="btn btn-sm btn-secondary"
               onClick={() => setSelectedAccounts(accounts.map(a => a.id))}
@@ -344,15 +336,10 @@ function Automation() {
                     {account.username && <p className="account-username">@{account.username}</p>}
                     {/* Show current preset */}
                     {account.preset && (
-                      <span className="preset-badge" style={{ 
-                        backgroundColor: presetDescriptions[account.preset]?.color || '#666',
-                        color: 'white',
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.75rem',
-                        marginTop: '4px',
-                        display: 'inline-block'
-                      }}>
+                      <span 
+                        className="preset-badge" 
+                        style={{ backgroundColor: presetDescriptions[account.preset]?.color || '#666' }}
+                      >
                         {presetDescriptions[account.preset]?.name || account.preset}
                       </span>
                     )}
