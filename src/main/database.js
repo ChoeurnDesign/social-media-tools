@@ -688,21 +688,47 @@ class DatabaseManager {
 
   // Device management methods
   assignRandomDeviceToAccount(accountId) {
-    const deviceKeys = [
-      'iphone13promax', 'iphone13', 'iphone12', 'iphone11', 
-      'iphone14', 'iphone14pro',
-      'galaxys21', 'galaxys22', 'pixel6', 'oneplus9'
+    // ✅ All 32 device keys
+    const allDeviceKeys = [
+      // iPhones (12)
+      'iphone15promax', 'iphone15pro', 'iphone15', 'iphone14promax', 'iphone14pro', 'iphone14',
+      'iphone13promax', 'iphone13pro', 'iphone13', 'iphone13mini', 'iphone12', 'iphone11',
+      // Samsung (10)
+      'galaxys24ultra', 'galaxys24', 'galaxys23ultra', 'galaxys23', 'galaxys22ultra', 'galaxys22',
+      'galaxys21ultra', 'galaxys21', 'galaxyzfold5', 'galaxya54',
+      // Pixel (6)
+      'pixel8pro', 'pixel8', 'pixel7pro', 'pixel7', 'pixel6pro', 'pixel6',
+      // OnePlus (4)
+      'oneplus11', 'oneplus10pro', 'oneplus9pro', 'oneplus9'
     ];
-    const randomDeviceKey = deviceKeys[Math.floor(Math.random() * deviceKeys.length)];
+    
+    // ✅ Get already assigned devices (excluding current account)
+    const assigned = this.db.prepare(`
+      SELECT device_type FROM accounts 
+      WHERE device_type IS NOT NULL AND id != ?
+    `).all(accountId).map(row => row.device_type);
+    
+    // ✅ Filter out already used devices
+    let available = allDeviceKeys.filter(d => !assigned.includes(d));
+    
+    // ✅ If all devices are used, shuffle and reuse (strategic reuse for 20+ accounts)
+    if (available.length === 0) {
+      available = [...allDeviceKeys].sort(() => Math.random() - 0.5);
+      console.log(`All ${allDeviceKeys.length} devices assigned, strategically reusing with randomization`);
+    }
+    
+    // ✅ Pick random device from available pool
+    const deviceKey = available[Math.floor(Math.random() * available.length)];
     
     const stmt = this.db.prepare(`
       UPDATE accounts 
       SET device_type = ? 
       WHERE id = ?
     `);
-    stmt.run(randomDeviceKey, accountId);
+    stmt.run(deviceKey, accountId);
     
-    return randomDeviceKey;
+    console.log(`Assigned device '${deviceKey}' to account ${accountId}`);
+    return deviceKey;
   }
 
   getAccountDevice(accountId) {

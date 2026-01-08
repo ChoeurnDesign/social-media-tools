@@ -82,20 +82,20 @@ class AutomationEngine {
   async applyPreset(accountId, presetName) {
     const preset = this.getPreset(presetName);
     
-    // ✅ Add randomization to preset values
+    // ✅ Add randomization to preset values (wider variation for anti-detection)
     const randomizedSettings = {
       auto_scroll: preset.autoScroll.enabled ? 1 : 0,
-      // ✅ Random scroll speed (±30% variation)
-      scroll_speed: Math.floor(preset.autoScroll.speed * (0.7 + Math.random() * 0.6)),
+      // ✅ ±50% speed variation (was ±30%)
+      scroll_speed: Math.floor(preset.autoScroll.speed * (0.5 + Math.random())),
       auto_like: preset.autoLike.enabled ? 1 : 0,
-      // ✅ Random like probability (±0.1 variation)
-      like_probability: Math.max(0.1, Math.min(0.9, preset.autoLike.probability + (Math.random() * 0.2 - 0.1))),
+      // ✅ ±0.2 probability variation (was ±0.1)
+      like_probability: Math.max(0.05, Math.min(0.95, preset.autoLike.probability + (Math.random() * 0.4 - 0.2))),
       auto_follow: preset.autoFollow?.enabled ? 1 : 0,
-      // ✅ Random daily limit (±20% variation)
-      follow_daily_limit: Math.floor((preset.autoFollow?.dailyLimit || 100) * (0.8 + Math.random() * 0.4)),
+      // ✅ ±30% daily limit variation (was ±20%)
+      follow_daily_limit: Math.floor((preset.autoFollow?.dailyLimit || 100) * (0.7 + Math.random() * 0.6)),
       auto_comment: preset.autoComment?.enabled ? 1 : 0,
-      // ✅ Random comment probability
-      comment_probability: Math.max(0.05, Math.min(0.5, (preset.autoComment?.probability || 0.2) + (Math.random() * 0.1 - 0.05))),
+      // ✅ ±0.15 probability variation (was ±0.05)
+      comment_probability: Math.max(0.05, Math.min(0.5, (preset.autoComment?.probability || 0.2) + (Math.random() * 0.3 - 0.15))),
       preset: presetName
     };
 
