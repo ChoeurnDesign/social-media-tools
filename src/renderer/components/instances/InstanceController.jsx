@@ -224,11 +224,11 @@ function InstanceController() {
         </div>
         <div className="stat-item">
           <span className="stat-label">Layout:</span>
-          <span className="stat-value">{settings.instancesPerRow} per row</span>
+          <span className="stat-value">Dynamic Grid (Auto)</span>
         </div>
         <div className="stat-item">
           <span className="stat-label">Device:</span>
-          <span className="stat-value">{settings.devicePreset}</span>
+          <span className="stat-value">32 Models Available</span>
         </div>
       </div>
 
@@ -310,9 +310,9 @@ function InstanceController() {
         </div>
       ) : (
         <div className="instance-grid">
-          {instances.map((instance) => (
+          {instances.map((instance, index) => (
             <InstanceCard
-              key={instance.accountId}
+              key={`instance-${instance.accountId}-${index}`}  // ✅ Guaranteed unique key
               instance={instance}
               onRefresh={loadInstances}
             />
@@ -323,26 +323,6 @@ function InstanceController() {
       <div className="instance-settings-panel">
         <h3 className="settings-title">Instance Settings</h3>
         <div className="settings-grid">
-          <div className="setting-item">
-            <label>Instances Per Row</label>
-            <input
-              type="number"
-              min="2"
-              max="5"
-              value={settings.instancesPerRow}
-              onChange={(e) => handleUpdateSettings({ instancesPerRow: parseInt(e.target.value) })}
-            />
-          </div>
-          <div className="setting-item">
-            <label>Window Spacing (px)</label>
-            <input
-              type="number"
-              min="10"
-              max="50"
-              value={settings.spacing}
-              onChange={(e) => handleUpdateSettings({ spacing: parseInt(e.target.value) })}
-            />
-          </div>
           <div className="setting-item">
             <label>Max Instances</label>
             <input

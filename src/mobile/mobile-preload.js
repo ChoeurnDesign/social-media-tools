@@ -26,12 +26,36 @@ function startAutoScroll(speed = 100) {
 
   console.log(`🔄 Auto-scroll started at base speed ${speed}ms`);
 
+  let scrollCount = 0;
+  let lastPauseAt = 0;
+
   autoScrollInterval = setInterval(() => {
-    // ✅ Random scroll amount with variation (more human-like)
-    const baseScroll = 50 + Math.random() * 50;
-    const scrollAmount = baseScroll * (0.7 + Math.random() * 0.6);  // ±30% variation
+    scrollCount++;
     
-    console.log(`📜 Scrolling ${Math.round(scrollAmount)}px`);
+    // ✅ Human-like pauses: Random pause every 5-15 videos
+    const videosBeforePause = Math.floor(Math.random() * 11) + 5;  // 5-15 videos
+    if (scrollCount - lastPauseAt >= videosBeforePause) {
+      console.log(`☕ Taking a human break after ${scrollCount - lastPauseAt} videos...`);
+      clearInterval(autoScrollInterval);
+      
+      // ✅ Pause duration: 10-60 seconds
+      const pauseDuration = Math.floor(Math.random() * 50000) + 10000;  // 10-60 seconds
+      console.log(`⏸️ Pausing for ${Math.round(pauseDuration/1000)} seconds`);
+      
+      setTimeout(() => {
+        lastPauseAt = scrollCount;
+        console.log('▶️ Resuming auto-scroll after break');
+        startAutoScroll(speed);
+      }, pauseDuration);
+      
+      return;
+    }
+    
+    // ✅ Wide scroll variation (±50% instead of ±30%)
+    const baseScroll = 50 + Math.random() * 50;
+    const scrollAmount = baseScroll * (0.5 + Math.random());  // ±50% variation
+    
+    console.log(`📜 Scrolling ${Math.round(scrollAmount)}px (video ${scrollCount})`);
     
     window.scrollBy({
       top: scrollAmount,
@@ -43,6 +67,8 @@ function startAutoScroll(speed = 100) {
       console.log('🔁 Reached bottom, scrolling back to top');
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollCount = 0;  // Reset count
+        lastPauseAt = 0;
       }, 1000 + Math.random() * 2000);
     }
 
@@ -60,7 +86,7 @@ function startAutoScroll(speed = 100) {
       setTimeout(() => tryAutoComment(), 3000 + Math.random() * 7000);
     }
     
-  }, speed + Math.random() * (speed * 0.5));  // ✅ Variable interval (±50%)
+  }, speed + Math.random() * speed);  // ✅ ±100% interval variation (was ±50%)
 }
 
 function stopAutoScroll() {
@@ -233,3 +259,37 @@ contextBridge.exposeInMainWorld('mobileAutomation', {
 });
 
 console.log('Mobile automation preload initialized');
+
+// ✅ Randomized Initial Behavior (Anti-Detection)
+// This makes each account start differently to avoid synchronized patterns
+window.addEventListener('DOMContentLoaded', () => {
+  // ✅ Random initial delay (3-13 seconds) before any action
+  const initialDelay = Math.floor(Math.random() * 10000) + 3000;
+  
+  console.log(`⏳ Waiting ${Math.round(initialDelay/1000)}s before initial behavior (anti-detection)`);
+  
+  setTimeout(() => {
+    // ✅ Random initial scrolls (0-5 videos) to randomize starting position
+    const initialScrolls = Math.floor(Math.random() * 6);
+    
+    if (initialScrolls > 0) {
+      console.log(`🎲 Performing ${initialScrolls} random initial scrolls to vary starting position`);
+      
+      for (let i = 0; i < initialScrolls; i++) {
+        setTimeout(() => {
+          // Random scroll speed for each initial scroll
+          const scrollDelay = 2000 + Math.random() * 3000;  // 2-5 seconds between scrolls
+          
+          window.scrollBy({
+            top: window.innerHeight,
+            behavior: 'smooth'
+          });
+          
+          console.log(`📜 Initial scroll ${i + 1}/${initialScrolls}`);
+        }, i * (2000 + Math.random() * 3000));
+      }
+    } else {
+      console.log('🎯 Starting at default position (no initial scrolls)');
+    }
+  }, initialDelay);
+});
